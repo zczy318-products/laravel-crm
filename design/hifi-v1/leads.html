@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Placeholder — Relay [placeholder] (hi-fi v1)</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/hifi.css">
+<style>
+  body { display: grid; place-items: center; min-height: 100vh; padding: 20px; }
+  .card { max-width: 520px; width: 100%; padding: 32px; display: grid; gap: 14px; }
+  .card h1 { font-size: 22px; font-weight: 600; }
+  .dest { padding: 12px 14px; border-radius: 12px; background: var(--band); border: 1px solid var(--border); font-weight: 500; }
+</style>
+</head>
+<body>
+  <main class="card">
+    <span class="tag tag-warn" style="justify-self:start">Placeholder — not designed in this round</span>
+    <h1>This is where the click goes</h1>
+    <p class="muted">Only the landing, sign-in and dashboard pages are designed in hi-fi v1. This page shows the destination of the link you clicked so the flow can be reviewed.</p>
+    <div class="dest" id="dest">Leads board</div>
+    <a class="btn btn-primary" href="dashboard.html" style="justify-self:start"><i data-i="left"></i>Back to dashboard</a>
+  </main>
+<script src="assets/hifi.js"></script>
+<script>
+  const q = new URLSearchParams(location.search);
+  const names = { 'follow-up': 'Follow Up', new: 'New', prospect: 'Prospect', negotiation: 'Negotiation' };
+  const go = { quotes: 'Quotes list', mail: 'Mail inbox', activities: 'Activities calendar', contacts: 'Contacts (persons & organizations)', products: 'Products', reports: 'Reports', settings: 'Settings' };
+  const fl = { 'new-30d': 'Leads created in the last 30 days', open: 'All open leads', 'won-30d': 'Leads won in the last 30 days', 'closed-30d': 'Leads won or lost in the last 30 days' };
+  let t = 'Leads board';
+  if (q.get('stage')) t = 'Leads board → filtered to stage “' + (names[q.get('stage')] || q.get('stage')) + '”';
+  else if (q.get('lead')) t = 'Lead detail → “' + q.get('lead') + '”';
+  else if (q.get('new')) t = 'Quick create → ' + q.get('new');
+  else if (q.get('go')) t = go[q.get('go')] || q.get('go');
+  else if (q.get('filter')) t = 'Leads table → ' + (fl[q.get('filter')] || q.get('filter'));
+  document.getElementById('dest').textContent = t;
+</script>
+</body>
+</html>

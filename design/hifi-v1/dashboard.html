@@ -1,0 +1,546 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard — Relay [placeholder] (hi-fi v1)</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/hifi.css">
+<style>
+  /* App shell: 264px sidebar (collapsible to 72px) + 56px sticky top bar */
+  .shell { display: grid; grid-template-columns: 264px minmax(0, 1fr); min-height: 100vh; }
+  .shell > div { min-width: 0; }
+  .shell.collapsed { grid-template-columns: 72px minmax(0, 1fr); }
+  .side { position: sticky; top: 0; height: 100vh; background: var(--bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 14px 12px; gap: 4px; overflow: hidden; }
+  .side .logo { height: 36px; padding: 0 4px; margin-bottom: 14px; white-space: nowrap; }
+  .side-sec { font-size: 12px; color: var(--faint); font-weight: 500; padding: 12px 10px 6px; white-space: nowrap; }
+  .nav-it { display: flex; align-items: center; gap: 12px; height: 38px; padding: 0 10px; border-radius: 10px; color: var(--text2); font-weight: 500; white-space: nowrap; }
+  .nav-it:hover { background: var(--hover); color: var(--text); }
+  .nav-it[aria-current="page"] { background: var(--current); color: var(--text); font-weight: 600; }
+  .nav-it .ico { width: 19px; height: 19px; }
+  .nav-it .cnt { margin-left: auto; font-size: 12px; color: var(--muted); font-weight: 500; }
+  .side-bottom { margin-top: auto; display: grid; gap: 4px; }
+  .collapse-btn { border: 0; background: transparent; cursor: pointer; width: 100%; text-align: left; }
+  .shell.collapsed .side .txt, .shell.collapsed .side .ph, .shell.collapsed .side .cnt, .shell.collapsed .side-sec { display: none; }
+  .shell.collapsed .nav-it { justify-content: center; padding: 0; }
+  .shell.collapsed .side .logo { justify-content: center; padding: 0; }
+  .shell.collapsed .collapse-btn .ico { transform: scaleX(-1); }
+
+  .top { position: sticky; top: 0; z-index: 30; height: 56px; background: rgba(246,247,249,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; padding: 0 36px; }
+  .top .m-logo { display: none; }
+  .search { position: relative; width: 360px; }
+  .search .ico { position: absolute; left: 12px; top: 11px; color: var(--muted); }
+  .search .input { padding-left: 38px; border-color: var(--border-ctl); background: var(--bg); }
+  .search kbd { position: absolute; right: 10px; top: 9px; font: 500 11px var(--font); color: var(--muted); border: 1px solid var(--border-ctl); border-radius: 6px; padding: 1px 6px; background: var(--band); }
+  .top-right { margin-left: auto; display: flex; align-items: center; gap: 6px; position: relative; }
+  .bell { position: relative; }
+  .bell .dot { position: absolute; top: 9px; right: 10px; width: 8px; height: 8px; border-radius: 50%; background: var(--risk); border: 2px solid var(--page); }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 600; border: 0; cursor: pointer; }
+  .menu { position: absolute; top: 46px; right: 40px; width: 220px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-pop); padding: 6px; z-index: 40; }
+  .menu[hidden] { display: none; }
+  .menu a { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 10px; border-radius: 8px; color: var(--text); }
+  .menu a:hover { background: var(--hover); }
+  .menu .ico { color: var(--muted); width: 16px; height: 16px; }
+
+  .content { padding: 28px 36px 64px; max-width: 1800px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .page-head { display: flex; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+  .page-head h1 { font-size: 28px; line-height: 36px; font-weight: 600; }
+  .page-head p { color: var(--muted); margin-top: 2px; }
+  .head-ctl { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+
+  .grid-today { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 20px; }
+  .list { list-style: none; margin: 0; padding: 0 8px 8px; }
+  .li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; }
+  .li:hover { background: var(--band); }
+  .li + .li { border-top: 1px solid var(--border); border-radius: 0 0 12px 12px; }
+  .li .body { flex: 1; min-width: 0; }
+  .li .t { font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .li .s { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .li .s a { color: var(--text2); }
+  .li .s a:hover { color: var(--brand); }
+  .li .type { width: 32px; height: 32px; border-radius: 9px; background: var(--current); color: var(--text2); display: grid; place-items: center; flex: none; }
+  .li .type .ico { width: 16px; height: 16px; }
+  .li .val { font-variant-numeric: tabular-nums; font-weight: 500; text-align: right; min-width: 72px; }
+  .done-btn { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--border-strong); background: var(--bg); cursor: pointer; flex: none; display: grid; place-items: center; color: transparent; padding: 0; }
+  .done-btn:hover { border-color: var(--ok); color: var(--ok); }
+  .done-btn .ico { width: 13px; height: 13px; }
+  .li.is-done { opacity: .5; }
+  .li.is-done .t { text-decoration: line-through; }
+  .li.is-done .done-btn { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .li-group { font-size: 12px; font-weight: 600; color: var(--muted); padding: 8px 12px 4px; display: flex; gap: 6px; align-items: center; }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+  .kpi { display: block; padding: 16px 18px; color: var(--text); }
+  .kpi:hover { color: var(--text); border-color: var(--border-ctl); background: var(--band); }
+  .kpi-l { display: flex; align-items: center; gap: 8px; color: var(--text2); font-weight: 500; }
+  .kpi-l .ico { color: var(--muted); width: 16px; height: 16px; }
+  .kpi-v { margin-top: 10px; font-size: 26px; line-height: 32px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .kpi-v.na { font-size: 18px; color: var(--muted); font-weight: 500; }
+  .kpi-c { margin-top: 4px; display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); }
+  .kpi-c b { display: inline-flex; align-items: center; gap: 3px; font-weight: 600; }
+  .kpi-c .ico { width: 14px; height: 14px; }
+  .kpi-c .pos { color: var(--ok); }
+  .kpi-c .neg { color: var(--risk); }
+  .kpi-d { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+
+  .charts { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 20px; }
+  .funnel { display: grid; gap: 12px; padding: 4px 20px 16px; }
+  .fr { display: grid; grid-template-columns: 104px minmax(0, 1fr) 150px; align-items: center; gap: 12px; padding: 4px 6px; margin: 0 -6px; border-radius: 8px; color: var(--text); }
+  .fr:hover { background: var(--band); color: var(--text); }
+  .fr:hover .bar { background: var(--series-hover); }
+  .fr .nm { font-weight: 500; }
+  .track { height: 18px; background: transparent; border-radius: 3px; }
+  .bar { height: 18px; background: var(--series); border-radius: 0 3px 3px 0; }
+  .fr .v { text-align: right; font-variant-numeric: tabular-nums; color: var(--text2); white-space: nowrap; }
+  .fr .v b { color: var(--text); font-weight: 600; }
+  .closed { display: flex; gap: 20px; padding: 12px 20px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text2); }
+  .closed span { display: inline-flex; align-items: center; gap: 6px; }
+
+  .cols { position: relative; display: grid; grid-template-columns: repeat(12, 1fr); align-items: end; gap: 0 10px; height: 200px; padding: 22px 20px 0; border-bottom: 1px solid var(--border-strong); margin: 0 20px; padding-left: 0; padding-right: 0; }
+  .colw { position: relative; height: 100%; display: flex; align-items: flex-end; justify-content: center; cursor: default; }
+  .colw:hover { background: var(--band); }
+  .colb { width: 100%; max-width: 32px; background: var(--series); border-radius: 3px 3px 0 0; position: relative; }
+  .colw:hover .colb { background: var(--series-hover); }
+  .colb span { position: absolute; top: -18px; left: 50%; transform: translateX(-50%); font-size: 12px; color: var(--text2); font-variant-numeric: tabular-nums; }
+  .xl { display: grid; grid-template-columns: repeat(12, 1fr); gap: 0 10px; margin: 6px 20px 0; font-size: 11px; color: var(--muted); text-align: center; font-variant-numeric: tabular-nums; }
+  .xl span:nth-child(even) { visibility: hidden; }
+  .note { padding: 12px 20px 16px; font-size: 12px; color: var(--muted); }
+  .tip { position: fixed; z-index: 60; pointer-events: none; background: var(--text); color: #fff; font-size: 12px; padding: 6px 10px; border-radius: 8px; box-shadow: var(--shadow-pop); white-space: nowrap; }
+
+  .reports-head { display: flex; align-items: flex-end; gap: 12px; margin-top: 12px; }
+  .reports-head h2 { font-size: 18px; font-weight: 600; }
+  .reports-head p { color: var(--muted); font-size: 13px; }
+  .reports-head a { margin-left: auto; }
+  .reports { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+  .hb { display: grid; gap: 12px; padding: 4px 20px 18px; }
+  .hb-r { display: grid; grid-template-columns: 76px minmax(0, 1fr) 64px; gap: 10px; align-items: center; font-size: 13px; }
+  .hb-r .v { text-align: right; font-variant-numeric: tabular-nums; }
+  .stack-bar { display: flex; gap: 2px; height: 18px; margin: 8px 20px 0; }
+  .stack-bar div { border-radius: 3px; }
+  .legend { display: grid; gap: 8px; padding: 14px 20px 18px; font-size: 13px; }
+  .legend div { display: flex; align-items: center; gap: 8px; }
+  .legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .legend b { margin-left: auto; font-weight: 500; font-variant-numeric: tabular-nums; }
+  .rank { list-style: none; margin: 0; padding: 0 20px 14px; counter-reset: r; }
+  .rank li { display: flex; gap: 10px; align-items: baseline; padding: 7px 0; border-top: 1px solid var(--border); font-size: 13px; }
+  .rank li:first-child { border-top: 0; }
+  .rank li::before { counter-increment: r; content: counter(r); color: var(--faint); width: 12px; font-variant-numeric: tabular-nums; }
+  .rank .n { flex: 1; min-width: 0; }
+  .rank .n small { display: block; color: var(--muted); font-size: 12px; }
+  .rank .v { font-variant-numeric: tabular-nums; font-weight: 500; }
+
+  /* Empty + setup */
+  .empty { display: grid; justify-items: center; text-align: center; gap: 8px; padding: 28px 24px 32px; }
+  .empty .card-icon { width: 44px; height: 44px; border-radius: 12px; }
+  .empty h3 { font-size: 15px; font-weight: 600; margin-top: 4px; }
+  .empty p { color: var(--muted); max-width: 340px; }
+  .empty .btn { margin-top: 8px; }
+  .setup { padding: 22px 24px 24px; }
+  .setup-h { display: flex; align-items: center; gap: 16px; }
+  .setup-h h2 { font-size: 18px; font-weight: 600; }
+  .setup-h p { color: var(--muted); margin-top: 2px; }
+  .prog { margin-left: auto; display: grid; gap: 6px; width: 180px; font-size: 12px; color: var(--muted); text-align: right; }
+  .prog .t { height: 6px; border-radius: 3px; background: var(--track); }
+  .choices { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px; }
+  .choice { border: 1px solid var(--border); border-radius: 12px; padding: 18px; display: grid; gap: 8px; align-content: start; }
+  .choice h3 { font-size: 15px; font-weight: 600; margin-top: 4px; }
+  .choice p { color: var(--muted); font-size: 13px; }
+  .choice .btn { justify-self: start; margin-top: 6px; }
+  .choice.primary { border-color: var(--brand); background: var(--brand-soft); }
+
+  .skel-row { display: flex; gap: 12px; align-items: center; padding: 12px 20px; }
+
+  .tabbar { display: none; }
+  .hs-hint { display: none; }
+
+  /* ---------- Mobile (390px): bottom tab bar, today first, swipeable charts ---------- */
+  @media (max-width: 767px) {
+    .shell, .shell.collapsed { grid-template-columns: minmax(0, 1fr); }
+    .side { display: none; }
+    .top { padding: 0 12px 0 16px; gap: 2px; background: rgba(255,255,255,.95); }
+    .top .m-logo { display: inline-flex; font-size: 16px; }
+    .top .m-logo .ph { display: none; }
+    .search { display: none; }
+    .top-right .m-search { display: inline-flex; }
+    .menu { right: 8px; }
+    .content { padding: 18px 16px 104px; gap: 16px; }
+    .page-head { align-items: flex-start; flex-direction: column; gap: 12px; }
+    .page-head h1 { font-size: 22px; line-height: 30px; }
+    /* 390 review fix: range control wrapped to its own full-width row instead of clipping "Quarter" */
+    .head-ctl { margin-left: 0; width: 100%; flex-wrap: wrap; gap: 8px; }
+    .head-ctl .export { display: none; }
+    .head-ctl > * { flex: 1 1 100%; }
+    .head-ctl > .btn { justify-content: flex-start; }
+    .head-ctl .seg { display: flex; }
+    .head-ctl .seg button { flex: 1; height: 36px; }
+    /* 44px touch target around the 22px done circle */
+    .done-btn { position: relative; }
+    .done-btn::after { content: ""; position: absolute; inset: -11px; }
+    .card-head .btn-ghost { display: none; }
+    .closed { flex-wrap: wrap; gap: 8px 16px; }
+    .grid-today, .charts { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+    .card-head { padding: 16px 16px 10px; }
+    .list { padding: 0 4px 6px; }
+    .li { padding: 10px; gap: 10px; }
+    .li .open, .li .type { display: none; }
+    .li .val { min-width: 0; }
+    .kpis { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .kpi { padding: 14px; }
+    .kpi-v { font-size: 22px; line-height: 28px; }
+    .kpi-d { display: none; }
+    .hs { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -16px; padding: 0 16px 4px; scrollbar-width: none; }
+    .hs > .card { flex: 0 0 86%; scroll-snap-align: start; }
+    .hs-hint { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: -6px; }
+    .fr { grid-template-columns: 82px minmax(0, 1fr) 70px; gap: 8px; }
+    .fr .v span { display: none; }
+    .cols { gap: 0 4px; height: 170px; margin: 0 16px; }
+    .xl { gap: 0 4px; margin: 6px 16px 0; font-size: 9.5px; }
+    .colb span { font-size: 10.5px; }
+    .reports-head { margin-top: 4px; }
+    .reports-head p { display: none; }
+    .reports { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .setup { padding: 18px 16px; }
+    .setup-h { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .prog { margin-left: 0; width: 100%; text-align: left; }
+    .choices { grid-template-columns: minmax(0, 1fr); gap: 10px; margin-top: 14px; }
+    .tabbar { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: rgba(255,255,255,.97); border-top: 1px solid var(--border); padding: 6px 4px calc(8px + env(safe-area-inset-bottom)); }
+    .tabbar a { display: grid; justify-items: center; gap: 2px; font-size: 11px; font-weight: 500; color: var(--muted); padding: 4px 0; border-radius: 10px; }
+    .tabbar a .ico { width: 22px; height: 22px; }
+    .tabbar a[aria-current="page"] { color: var(--brand); font-weight: 600; }
+    .proto { bottom: 84px; }
+    .toast-host { bottom: 88px; }
+  }
+  @media (min-width: 768px) { .top-right .m-search { display: none; } }
+  @media (min-width: 768px) and (max-width: 1199px) {
+    .shell { grid-template-columns: 72px minmax(0, 1fr); }
+    .shell .side .txt, .shell .side .ph, .shell .side .cnt, .shell .side-sec { display: none; }
+    .shell .nav-it, .shell .side .logo { justify-content: center; padding: 0; }
+    .collapse-btn { display: none; }
+    .top, .content { padding-left: 24px; padding-right: 24px; }
+    .kpis, .reports { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-today, .charts { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="shell" id="shell">
+  <aside class="side" aria-label="Main navigation">
+    <a class="logo" href="landing.html"><span class="logo-mark"></span><span class="txt">Relay</span> <span class="ph">[placeholder]</span></a>
+    <a class="nav-it" href="dashboard.html" aria-current="page" title="Dashboard"><i data-i="home"></i><span class="txt">Dashboard</span></a>
+    <a class="nav-it" href="leads.html" title="Leads"><i data-i="kanban"></i><span class="txt">Leads</span><span class="cnt num" data-cnt="leads">64</span></a>
+    <a class="nav-it" href="leads.html?go=quotes" title="Quotes"><i data-i="quote"></i><span class="txt">Quotes</span></a>
+    <a class="nav-it" href="leads.html?go=mail" title="Mail"><i data-i="mail"></i><span class="txt">Mail</span><span class="cnt num" data-cnt="mail">3</span></a>
+    <a class="nav-it" href="leads.html?go=activities" title="Activities"><i data-i="calendar"></i><span class="txt">Activities</span></a>
+    <div class="side-sec">Records</div>
+    <a class="nav-it" href="leads.html?go=contacts" title="Contacts"><i data-i="users"></i><span class="txt">Contacts</span></a>
+    <a class="nav-it" href="leads.html?go=products" title="Products"><i data-i="box"></i><span class="txt">Products</span></a>
+    <a class="nav-it" href="leads.html?go=reports" title="Reports"><i data-i="chart"></i><span class="txt">Reports</span></a>
+    <div class="side-bottom">
+      <a class="nav-it" href="leads.html?go=settings" title="Settings"><i data-i="settings"></i><span class="txt">Settings</span></a>
+      <button class="nav-it collapse-btn" type="button" id="collapseBtn" aria-expanded="true" aria-label="Collapse sidebar" title="Collapse sidebar"><i data-i="panel"></i><span class="txt">Collapse</span></button>
+    </div>
+  </aside>
+
+  <div>
+    <header class="top">
+      <a class="logo m-logo" href="landing.html"><span class="logo-mark"></span>Relay <span class="ph">[placeholder]</span></a>
+      <label class="search"><i data-i="search"></i><span class="sr-only">Search</span><input class="input" type="search" placeholder="Search leads, contacts, quotes…"><kbd>⌘K</kbd></label>
+      <div class="top-right">
+        <button class="btn btn-icon btn-ghost m-search" type="button" aria-label="Search"><i data-i="search"></i></button>
+        <button class="btn btn-primary btn-sm" type="button" id="newBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="newMenu"><i data-i="plus"></i><span class="txt">New</span></button>
+        <div class="menu" id="newMenu" role="menu" hidden>
+          <a role="menuitem" href="leads.html?new=lead"><i data-i="kanban"></i>Lead</a>
+          <a role="menuitem" href="leads.html?new=person"><i data-i="users"></i>Person</a>
+          <a role="menuitem" href="leads.html?new=organization"><i data-i="building"></i>Organization</a>
+          <a role="menuitem" href="leads.html?new=activity"><i data-i="calendar"></i>Activity</a>
+          <a role="menuitem" href="leads.html?new=quote"><i data-i="quote"></i>Quote</a>
+          <a role="menuitem" href="leads.html?new=email"><i data-i="mail"></i>Email</a>
+        </div>
+        <button class="btn btn-icon btn-ghost bell" type="button" aria-label="Notifications, 2 unread"><i data-i="bell"></i><span class="dot" id="bellDot"></span></button>
+        <button class="avatar" type="button" aria-label="Account: Alex Morgan" onclick="Hifi.toast('Account menu: profile, dark mode, sign out.')">AM</button>
+      </div>
+    </header>
+
+    <main class="content" id="content" aria-live="polite"></main>
+  </div>
+
+  <nav class="tabbar" aria-label="Main">
+    <a href="dashboard.html" aria-current="page"><i data-i="home"></i>Home</a>
+    <a href="leads.html"><i data-i="kanban"></i>Leads</a>
+    <a href="leads.html?go=activities"><i data-i="calendar"></i>Activities</a>
+    <a href="leads.html?go=contacts"><i data-i="users"></i>Contacts</a>
+    <a href="#" onclick="Hifi.toast('More: Quotes, Mail, Products, Reports, Settings.');return false"><i data-i="more"></i>More</a>
+  </nav>
+</div>
+
+<script src="assets/hifi.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const fmt = n => '$' + n.toLocaleString('en-US');
+
+// ---- Realistic sample data (fictional companies; Krayin default pipeline, sources and types) ----
+const D = {
+  activities: [
+    { id: 1, type: 'phone', kind: 'Call', title: 'Renewal pricing call', person: 'Priya Raman', org: 'Brightline Logistics', lead: 'Renewal + 10 seats', due: 'Oct 31', late: 2 },
+    { id: 2, type: 'users', kind: 'Meeting', title: 'Contract review', person: 'Daniel Okafor', org: 'Northgate Couriers', lead: 'Fleet tracking – 40 seats', due: 'Nov 1', late: 1 },
+    { id: 3, type: 'phone', kind: 'Call', title: 'Discovery call', person: 'Mei Lin', org: 'Harbor & Pine Dental', lead: 'Clinic scheduling bundle', time: '10:30 AM' },
+    { id: 4, type: 'coffee', kind: 'Lunch', title: 'Lunch with Marco', person: 'Marco Silva', org: 'Atlas Freight', lead: 'Route planning pilot', time: '12:30 PM' },
+    { id: 5, type: 'users', kind: 'Meeting', title: 'Product demo (video call)', person: 'Tom Becker', org: 'Fieldwise Agritech', lead: 'Field sensor rollout', time: '2:00 PM' }
+  ],
+  idle: [
+    { title: 'Fleet tracking – 40 seats', org: 'Northgate Couriers', stage: 'Negotiation', value: 24000, days: 18 },
+    { title: 'Annual support plan', org: 'Kestrel Analytics', stage: 'Prospect', value: 9600, days: 12 },
+    { title: 'Clinic scheduling bundle', org: 'Harbor & Pine Dental', stage: 'Follow Up', value: 6400, days: 9 }
+  ],
+  stages: [
+    { code: 'new', name: 'New', n: 22, v: 61200 },
+    { code: 'follow-up', name: 'Follow Up', n: 18, v: 84750 },
+    { code: 'prospect', name: 'Prospect', n: 14, v: 96300 },
+    { code: 'negotiation', name: 'Negotiation', n: 10, v: 76200 }
+  ],
+  weeks: [['08/10', 6], ['08/17', 8], ['08/24', 7], ['08/31', 9], ['09/07', 8], ['09/14', 10], ['09/21', 9], ['09/28', 12], ['10/05', 11], ['10/12', 10], ['10/19', 12], ['10/26', 13]],
+  sources: [['Web Form', 26800], ['Email', 19400], ['Direct', 12600], ['Phone', 8300], ['Web', 5200]],
+  types: [['New Business', 47900, 'var(--series)'], ['Existing Business', 24400, 'var(--cat2)']],
+  products: [['Onboarding package', 'Services', 18000], ['Annual support plan', 'Subscription', 14400], ['Scheduling module', 'Software', 11200], ['API access add-on', 'Software', 7500]],
+  people: [['Priya Raman', 'Brightline Logistics', 16500], ['Tom Becker', 'Fieldwise Agritech', 12800], ['Aisha Khan', 'Meridian Studio', 9900], ['Lukas Weber', 'Alpenblick Tours', 8200]]
+};
+
+const headCtl = (disabled) => `
+  <div class="head-ctl">
+    <button class="btn btn-sm" type="button" ${disabled ? 'disabled' : ''} onclick="Hifi.toast('Pipeline picker: Default Pipeline is the only pipeline in this sample.')"><i data-i="kanban"></i>Default Pipeline<i data-i="down"></i></button>
+    <div class="seg" role="group" aria-label="Date range">
+      <button type="button" ${disabled ? 'disabled' : ''} aria-pressed="false">7 days</button><button type="button" ${disabled ? 'disabled' : ''} aria-pressed="true">30 days</button><button type="button" ${disabled ? 'disabled' : ''} aria-pressed="false">Quarter</button>
+    </div>
+    <button class="btn btn-sm btn-ghost export" type="button" ${disabled ? 'disabled' : ''} onclick="Hifi.toast('Exports the dashboard as PDF.')"><i data-i="download"></i>Export PDF</button>
+  </div>`;
+
+function activityRow(a) {
+  const due = a.late ? `<span class="tag tag-risk"><i data-i="clock"></i>${a.late}d overdue</span>` : `<span class="tag tag-warn"><i data-i="clock"></i>${a.time}</span>`;
+  return `<li class="li" data-id="${a.id}">
+    <button class="done-btn" type="button" aria-label="Mark “${a.title}” as done"><i data-i="check"></i></button>
+    <span class="type" title="${a.kind}"><i data-i="${a.type}"></i></span>
+    <div class="body"><div class="t">${a.title}</div><div class="s">${a.kind} · ${a.person}, ${a.org} · <a href="leads.html?lead=${encodeURIComponent(a.lead)}">${a.lead}</a></div></div>
+    ${due}
+    <a class="btn btn-sm open" href="leads.html?lead=${encodeURIComponent(a.lead)}">Open</a>
+  </li>`;
+}
+
+function viewData() {
+  const late = D.activities.filter(a => a.late), today = D.activities.filter(a => !a.late);
+  const maxN = Math.max(...D.stages.map(s => s.n)), maxW = Math.max(...D.weeks.map(w => w[1]));
+  const srcMax = D.sources[0][1], typeTotal = D.types.reduce((s, t) => s + t[1], 0);
+  return `
+  <div class="page-head">
+    <div><h1>Good morning, Alex</h1><p>Monday, November 2 · <span id="dueSummary">${today.length} due today, ${late.length} overdue</span></p></div>
+    ${headCtl()}
+  </div>
+
+  <section class="grid-today" aria-label="Today">
+    <div class="card">
+      <div class="card-head"><span class="card-icon"><i data-i="calendar"></i></span><div><h2>Due today &amp; overdue</h2><div class="card-sub">Your activities · times in GMT+8</div></div><a class="btn btn-sm btn-ghost" style="margin-left:auto" href="leads.html?go=activities">Calendar<i data-i="right"></i></a></div>
+      <ul class="list" id="actList">
+        <li class="li-group" style="color:var(--risk)"><i data-i="alert"></i>Overdue</li>
+        ${late.map(activityRow).join('')}
+        <li class="li-group">Today</li>
+        ${today.map(activityRow).join('')}
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon"><i data-i="flag"></i></span><div><h2>Leads to follow up</h2><div class="card-sub">Open leads with no activity for 7+ days</div></div></div>
+      <ul class="list">
+        ${D.idle.map(l => `<li class="li">
+          <div class="body"><div class="t"><a href="leads.html?lead=${encodeURIComponent(l.title)}" style="color:inherit">${l.title}</a></div><div class="s">${l.org} · ${l.stage}</div></div>
+          <span class="tag tag-risk">${l.days}d idle</span>
+          <span class="val">${fmt(l.value)}</span>
+        </li>`).join('')}
+      </ul>
+      <div class="card-foot">Idle = no call, meeting, lunch, note or email logged on the lead.</div>
+    </div>
+  </section>
+
+  <section class="kpis" aria-label="Key numbers">
+    <a class="card kpi" href="leads.html?filter=new-30d"><div class="kpi-l"><i data-i="inbox"></i>New leads</div><div class="kpi-v">46</div><div class="kpi-c"><b class="pos"><i data-i="up"></i>15%</b>vs previous 30 days</div><div class="kpi-d">Leads created Oct 4 – Nov 2</div></a>
+    <a class="card kpi" href="leads.html?filter=open"><div class="kpi-l"><i data-i="kanban"></i>Open pipeline</div><div class="kpi-v">$318,450</div><div class="kpi-c"><b class="pos"><i data-i="up"></i>6%</b>64 open leads</div><div class="kpi-d">Sum of lead value, all open stages</div></a>
+    <a class="card kpi" href="leads.html?filter=won-30d"><div class="kpi-l"><i data-i="trophy"></i>Won</div><div class="kpi-v">$72,300</div><div class="kpi-c"><b class="pos"><i data-i="up"></i>9%</b>11 leads won</div><div class="kpi-d">Lead value moved to Won, last 30 days</div></a>
+    <a class="card kpi" href="leads.html?filter=closed-30d"><div class="kpi-l"><i data-i="chart"></i>Win rate</div><div class="kpi-v">34%</div><div class="kpi-c"><b class="neg"><i data-i="dn"></i>4 pts</b>11 of 32 closed</div><div class="kpi-d">Won ÷ (Won + Lost), last 30 days</div></a>
+  </section>
+
+  <div class="hs-hint"><span>Swipe for the trend chart</span><span>1 / 2</span></div>
+  <section class="charts hs" aria-label="Pipeline and trend">
+    <div class="card">
+      <div class="card-head"><span class="card-icon"><i data-i="funnel"></i></span><div><h2>Open leads by stage</h2><div class="card-sub">Default Pipeline · count and value · tap a stage to open the board</div></div></div>
+      <div class="funnel">
+        ${D.stages.map(s => `<a class="fr" href="leads.html?stage=${s.code}" data-tip="${s.name}: ${s.n} leads · ${fmt(s.v)}">
+          <span class="nm">${s.name}</span>
+          <span class="track"><span class="bar" style="display:block;width:${(s.n / maxN * 100).toFixed(1)}%"></span></span>
+          <span class="v"><b>${s.n}</b><span> · ${fmt(s.v)}</span></span>
+        </a>`).join('')}
+      </div>
+      <div class="closed"><span><span class="tag tag-ok"><i data-i="check"></i>Won</span><span class="num">11 · $72,300</span></span><span><span class="tag">Lost</span><span class="num">21</span></span><span class="muted" style="margin-left:auto">last 30 days</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-icon"><i data-i="chart"></i></span><div><h2>New leads per week</h2><div class="card-sub">Last 12 complete weeks · by created date · GMT+8</div></div></div>
+      <div class="cols">
+        ${D.weeks.map(w => `<div class="colw" data-tip="Week of ${w[0]}: ${w[1]} new leads"><div class="colb" style="height:${(w[1] / maxW * 100).toFixed(1)}%"><span>${w[1]}</span></div></div>`).join('')}
+      </div>
+      <div class="xl">${D.weeks.map(w => `<span>${w[0]}</span>`).join('')}</div>
+      <div class="note">Week starts Monday. This week (from 11/02) is not shown until it ends.</div>
+    </div>
+  </section>
+
+  <div class="reports-head"><div><h2>Reports</h2><p>Revenue from won leads · last 30 days</p></div><a class="btn btn-sm btn-ghost" href="leads.html?go=reports">All reports<i data-i="right"></i></a></div>
+  <section class="reports">
+    <div class="card"><div class="card-head"><div><h3>Revenue by source</h3><div class="card-sub">Won lead value</div></div></div>
+      <div class="hb">${D.sources.map(s => `<div class="hb-r" data-tip="${s[0]}: ${fmt(s[1])}"><span>${s[0]}</span><span class="track"><span class="bar" style="display:block;width:${(s[1] / srcMax * 100).toFixed(1)}%"></span></span><span class="v">${fmt(s[1])}</span></div>`).join('')}</div>
+    </div>
+    <div class="card"><div class="card-head"><div><h3>Revenue by type</h3><div class="card-sub">Won lead value · ${fmt(typeTotal)}</div></div></div>
+      <div class="stack-bar">${D.types.map(t => `<div style="flex:${t[1]};background:${t[2]}" data-tip="${t[0]}: ${fmt(t[1])}"></div>`).join('')}</div>
+      <div class="legend">${D.types.map(t => `<div><i style="background:${t[2]}"></i>${t[0]}<b>${fmt(t[1])} · ${Math.round(t[1] / typeTotal * 100)}%</b></div>`).join('')}</div>
+    </div>
+    <div class="card"><div class="card-head"><div><h3>Top products</h3><div class="card-sub">By won lead value</div></div></div>
+      <ol class="rank">${D.products.map(p => `<li><span class="n">${p[0]}<small>${p[1]}</small></span><span class="v">${fmt(p[2])}</span></li>`).join('')}</ol>
+    </div>
+    <div class="card"><div class="card-head"><div><h3>Top customers</h3><div class="card-sub">People by won lead value</div></div></div>
+      <ol class="rank">${D.people.map(p => `<li><span class="n">${p[0]}<small>${p[1]}</small></span><span class="v">${fmt(p[2])}</span></li>`).join('')}</ol>
+    </div>
+  </section>`;
+}
+
+function viewEmpty() {
+  const emptyBlock = (icon, h, p, btn, href) => `<div class="empty"><span class="card-icon"><i data-i="${icon}"></i></span><h3>${h}</h3><p>${p}</p>${btn ? `<a class="btn btn-sm" href="${href}">${btn}</a>` : ''}</div>`;
+  return `
+  <div class="page-head">
+    <div><h1>Welcome to Relay, Alex</h1><p>Your workspace is ready. Add your first leads and this dashboard fills itself in.</p></div>
+    ${headCtl(true)}
+  </div>
+
+  <section class="card setup" aria-label="Get started">
+    <div class="setup-h">
+      <span class="card-icon"><i data-i="zap"></i></span>
+      <div><h2>Get your pipeline started</h2><p>Pick any one — you can do the others later.</p></div>
+      <div class="prog"><span>0 of 3 done</span><div class="t"></div></div>
+    </div>
+    <div class="choices">
+      <div class="choice"><span class="card-icon"><i data-i="upload"></i></span><h3>Import contacts</h3><p>Upload a CSV or Excel file of people or leads. We'll map the columns with you.</p><a class="btn btn-sm" href="leads.html?new=import">Import file</a></div>
+      <div class="choice primary"><span class="card-icon" style="background:#fff;color:var(--brand)"><i data-i="kanban"></i></span><h3>Create your first lead</h3><p>Add a deal you're working on now: who, which company, and roughly how much.</p><a class="btn btn-sm btn-primary" href="leads.html?new=lead"><i data-i="plus"></i>New lead</a></div>
+      <div class="choice"><span class="card-icon"><i data-i="code"></i></span><h3>Embed a web form</h3><p>Put a contact form on your website. Every submission becomes a lead.</p><a class="btn btn-sm" href="leads.html?new=webform">Create form</a></div>
+    </div>
+  </section>
+
+  <section class="grid-today">
+    <div class="card"><div class="card-head"><span class="card-icon"><i data-i="calendar"></i></span><div><h2>Due today &amp; overdue</h2><div class="card-sub">Your activities · times in GMT+8</div></div></div>
+      ${emptyBlock('calendar', 'Nothing due today', 'Calls, meetings and lunches you schedule on a lead show up here on the day they\'re due.', 'Schedule an activity', 'leads.html?new=activity')}</div>
+    <div class="card"><div class="card-head"><span class="card-icon"><i data-i="flag"></i></span><div><h2>Leads to follow up</h2><div class="card-sub">Open leads with no activity for 7+ days</div></div></div>
+      ${emptyBlock('flag', 'No leads yet', 'Once you have open leads, the ones that have gone quiet are listed here.', '', '')}</div>
+  </section>
+
+  <section class="kpis">
+    <div class="card kpi"><div class="kpi-l"><i data-i="inbox"></i>New leads</div><div class="kpi-v">0</div><div class="kpi-c">No previous period yet</div><div class="kpi-d">Leads created Oct 4 – Nov 2</div></div>
+    <div class="card kpi"><div class="kpi-l"><i data-i="kanban"></i>Open pipeline</div><div class="kpi-v">$0</div><div class="kpi-c">0 open leads</div><div class="kpi-d">Sum of lead value, all open stages</div></div>
+    <div class="card kpi"><div class="kpi-l"><i data-i="trophy"></i>Won</div><div class="kpi-v">$0</div><div class="kpi-c">0 leads won</div><div class="kpi-d">Lead value moved to Won, last 30 days</div></div>
+    <div class="card kpi"><div class="kpi-l"><i data-i="chart"></i>Win rate</div><div class="kpi-v na">Can't calculate yet</div><div class="kpi-c">Needs 1 won or lost lead</div><div class="kpi-d">Won ÷ (Won + Lost), last 30 days</div></div>
+  </section>
+
+  <section class="charts">
+    <div class="card"><div class="card-head"><span class="card-icon"><i data-i="funnel"></i></span><div><h2>Open leads by stage</h2><div class="card-sub">Default Pipeline · New → Follow Up → Prospect → Negotiation</div></div></div>
+      ${emptyBlock('funnel', 'Your stages fill in as leads arrive', 'Each stage shows how many open leads it holds and what they\'re worth.', 'Open leads board', 'leads.html')}</div>
+    <div class="card"><div class="card-head"><span class="card-icon"><i data-i="chart"></i></span><div><h2>New leads per week</h2><div class="card-sub">Last 12 complete weeks · by created date · GMT+8</div></div></div>
+      ${emptyBlock('chart', 'No weeks to show yet', 'The trend starts after the first full week with a new lead.', '', '')}</div>
+  </section>
+  <p class="muted" style="font-size:13px">Revenue reports (by source, by type, top products, top customers) appear here after your first won lead.</p>`;
+}
+
+function viewLoading() {
+  const s = (w, h, r) => `<div class="skel" style="width:${w};height:${h || 12}px;${r ? 'border-radius:' + r + 'px' : ''}"></div>`;
+  const row = () => `<div class="skel-row">${s('32px', 32, 9)}<div style="flex:1;display:grid;gap:6px">${s('55%')}${s('35%', 10)}</div>${s('64px', 22)}</div>`;
+  const card = (rows, h) => `<div class="card"><div class="card-head">${s('36px', 36, 10)}<div style="display:grid;gap:6px;flex:1">${s('40%', 14)}${s('60%', 10)}</div></div>${h ? `<div style="padding:8px 20px 24px">${s('100%', h, 8)}</div>` : Array.from({ length: rows }, row).join('')}</div>`;
+  return `
+  <div role="status" aria-label="Loading dashboard" style="display:contents">
+    <span class="sr-only">Loading dashboard…</span>
+    <div class="page-head"><div style="display:grid;gap:10px">${s('280px', 26)}${s('220px', 12)}</div>${headCtl(true)}</div>
+    <section class="grid-today">${card(5)}${card(3)}</section>
+    <section class="kpis">${Array.from({ length: 4 }, () => `<div class="card kpi" style="display:grid;gap:12px">${s('50%')}${s('70%', 26)}${s('60%', 10)}</div>`).join('')}</section>
+    <section class="charts">${card(0, 170)}${card(0, 170)}</section>
+  </div>`;
+}
+
+// ---- Render + interactions ----
+let proto, done = new Set();
+function render(state) {
+  $('content').innerHTML = state === 'empty' ? viewEmpty() : state === 'loading' ? viewLoading() : viewData();
+  Hifi.paintIcons($('content'));
+  document.querySelectorAll('[data-cnt]').forEach(el => el.hidden = state !== 'data');
+  $('bellDot').hidden = state !== 'data';
+  proto && proto.mark(state);
+  const url = new URL(location); url.searchParams.set('state', state); url.searchParams.delete('from'); history.replaceState(null, '', url);
+}
+
+function updateSummary() {
+  const left = D.activities.filter(a => !done.has(a.id));
+  const el = $('dueSummary');
+  if (el) el.textContent = `${left.filter(a => !a.late).length} due today, ${left.filter(a => a.late).length} overdue`;
+}
+$('content').addEventListener('click', e => {
+  const b = e.target.closest('.done-btn');
+  if (b) {
+    const li = b.closest('.li'), id = +li.dataset.id, a = D.activities.find(x => x.id === id);
+    const isDone = li.classList.toggle('is-done');
+    b.setAttribute('aria-pressed', String(isDone));
+    isDone ? done.add(id) : done.delete(id);
+    updateSummary();
+    if (isDone) Hifi.toast(`${a.kind} marked as done`, { action: 'Undo', onAction: () => { li.classList.remove('is-done'); done.delete(id); updateSummary(); } });
+    return;
+  }
+  const seg = e.target.closest('.seg button');
+  if (seg && !seg.closest('[aria-label="Loading dashboard"]')) {
+    seg.parentNode.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === seg)));
+    Hifi.toast('Date range changes the numbers below (sample data stays the same in this mockup).');
+  }
+});
+
+// Chart tooltips
+const tip = document.createElement('div'); tip.className = 'tip'; tip.hidden = true; document.body.appendChild(tip);
+document.addEventListener('mousemove', e => {
+  const t = e.target.closest && e.target.closest('[data-tip]');
+  if (!t) { tip.hidden = true; return; }
+  tip.textContent = t.dataset.tip; tip.hidden = false;
+  tip.style.left = Math.min(e.clientX + 12, innerWidth - tip.offsetWidth - 8) + 'px'; tip.style.top = (e.clientY - 34) + 'px';
+});
+
+// Sidebar collapse (desktop)
+const shell = $('shell'), cb = $('collapseBtn');
+function setCollapsed(on) {
+  shell.classList.toggle('collapsed', on);
+  cb.setAttribute('aria-expanded', String(!on)); cb.setAttribute('aria-label', on ? 'Expand sidebar' : 'Collapse sidebar'); cb.title = on ? 'Expand sidebar' : 'Collapse sidebar';
+  try { localStorage.setItem('hifi-side-collapsed', on ? '1' : ''); } catch (_) {}
+}
+cb.addEventListener('click', () => setCollapsed(!shell.classList.contains('collapsed')));
+try { setCollapsed(!!localStorage.getItem('hifi-side-collapsed')); } catch (_) {}
+
+// Quick-create menu
+const nb = $('newBtn'), nm = $('newMenu');
+nb.addEventListener('click', e => { e.stopPropagation(); nm.hidden = !nm.hidden; nb.setAttribute('aria-expanded', String(!nm.hidden)); if (!nm.hidden) nm.querySelector('a').focus(); });
+document.addEventListener('click', e => { if (!nm.hidden && !nm.contains(e.target)) { nm.hidden = true; nb.setAttribute('aria-expanded', 'false'); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !nm.hidden) { nm.hidden = true; nb.setAttribute('aria-expanded', 'false'); nb.focus(); } });
+
+// Horizontal chart pager hint (mobile)
+document.addEventListener('scroll', e => {
+  if (!e.target.classList || !e.target.classList.contains('hs')) return;
+  const hs = e.target, i = Math.round(hs.scrollLeft / (hs.firstElementChild.offsetWidth + 12)) + 1;
+  const h = document.querySelector('.hs-hint span:last-child'); if (h) h.textContent = `${Math.min(i, hs.children.length)} / ${hs.children.length}`;
+}, true);
+
+proto = Hifi.protoPanel({
+  states: [{ id: 'data', label: 'With data' }, { id: 'empty', label: 'New account (empty)' }, { id: 'loading', label: 'Loading' }],
+  onSet: render,
+  extra: [{ label: 'Sign out → landing', onClick: () => location.href = 'landing.html' }],
+  note: 'Tick a circle to complete an activity (with Undo). Click a stage, a KPI or "Open" to see where it leads.'
+});
+
+// Arriving from sign-in: show the skeleton briefly, then data.
+const q = new URLSearchParams(location.search);
+if (q.get('from') === 'login') { render('loading'); setTimeout(() => render('data'), 1200); }
+else render(['data', 'empty', 'loading'].includes(q.get('state')) ? q.get('state') : 'data');
+</script>
+</body>
+</html>
