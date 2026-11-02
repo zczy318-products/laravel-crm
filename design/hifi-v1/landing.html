@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Relay [placeholder] — Sales CRM · Landing (hi-fi v1)</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/hifi.css">
+<style>
+  body { background: var(--bg); }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+
+  /* Top bar */
+  .nav { position: sticky; top: 0; z-index: 20; background: rgba(255,255,255,.92); backdrop-filter: saturate(1.4) blur(8px); border-bottom: 1px solid transparent; transition: border-color .2s; }
+  .nav.scrolled { border-bottom-color: var(--border); }
+  .nav .wrap { display: flex; align-items: center; height: 64px; gap: 32px; }
+  .nav-links { display: flex; gap: 4px; }
+  .nav-links a { color: var(--text2); font-weight: 500; padding: 8px 12px; border-radius: 8px; }
+  .nav-links a:hover { background: var(--hover); color: var(--text); }
+  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .nav-menu { display: none; }
+  .mnav { display: none; }
+
+  /* Hero */
+  .hero { padding: 72px 0 0; background: linear-gradient(180deg, #fff 0%, var(--page) 100%); overflow: hidden; }
+  .hero-copy { max-width: 760px; margin: 0 auto; text-align: center; }
+  .eyebrow { display: inline-flex; align-items: center; gap: 8px; height: 30px; padding: 0 12px; border-radius: 999px; background: var(--brand-soft); color: var(--brand); font-size: 13px; font-weight: 500; }
+  .hero h1 { margin-top: 20px; font-size: 56px; line-height: 1.07; letter-spacing: -.03em; font-weight: 650; }
+  .hero h1 span { color: var(--brand); }
+  .hero .lede { margin: 20px auto 0; max-width: 620px; font-size: 18px; line-height: 1.6; color: var(--text2); }
+  .hero-cta { margin-top: 32px; display: flex; justify-content: center; gap: 12px; }
+  .hero-note { margin-top: 14px; font-size: 13px; color: var(--muted); }
+
+  /* Product shot (HTML-rendered, so it stays crisp and matches the real UI) */
+  .shot { position: relative; margin: 56px auto 0; max-width: 1080px; }
+  .browser { border: 1px solid var(--border); border-bottom: 0; border-radius: 16px 16px 0 0; background: var(--bg); box-shadow: 0 -2px 40px rgba(23,24,28,.06); overflow: hidden; }
+  .browser-bar { display: flex; align-items: center; gap: 6px; height: 36px; padding: 0 14px; border-bottom: 1px solid var(--border); background: var(--band); }
+  .browser-bar i, .browser-bar .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border-ctl); display: inline-block; }
+  .browser-url { margin-left: 12px; height: 22px; padding: 0 10px; border-radius: 6px; background: var(--bg); border: 1px solid var(--border); font-size: 11px; color: var(--muted); display: flex; align-items: center; }
+  .app { display: grid; grid-template-columns: 188px 1fr; min-height: 420px; }
+  .app-side { border-right: 1px solid var(--border); padding: 14px 10px; display: grid; align-content: start; gap: 2px; font-size: 12.5px; }
+  .app-side .it { display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 8px; border-radius: 8px; color: var(--text2); }
+  .app-side .it .ico { width: 15px; height: 15px; }
+  .app-side .it.on { background: var(--current); color: var(--text); font-weight: 600; }
+  .app-main { padding: 16px 18px; background: var(--page); min-width: 0; }
+  .app-head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .app-head b { font-size: 15px; }
+  .app-head .tag { margin-left: 4px; }
+  .board { display: grid; grid-template-columns: repeat(4, minmax(180px, 1fr)); gap: 12px; }
+  .col-h { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--text2); padding: 0 2px 8px; }
+  .col-h span:last-child { color: var(--muted); font-weight: 500; }
+  .lc { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; font-size: 12px; }
+  .lc b { display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 2px; }
+  .lc .m { color: var(--muted); }
+  .lc .row { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+  .lc .av { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 9px; font-weight: 600; color: #fff; }
+  .lc .tag { height: 20px; font-size: 11px; padding: 0 6px; }
+  .lc.drag { transform: rotate(-2deg); box-shadow: var(--shadow-pop); border-color: var(--brand); }
+  .float-today { position: absolute; right: -24px; top: 120px; width: 290px; background: var(--bg); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow-pop); padding: 14px; font-size: 12.5px; }
+  .float-today h4 { font-size: 13px; display: flex; justify-content: space-between; margin-bottom: 10px; }
+  .ft { display: flex; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--border); }
+  .ft .card-icon { width: 28px; height: 28px; border-radius: 8px; }
+  .ft .card-icon .ico { width: 14px; height: 14px; }
+  .ft div:nth-child(2) { flex: 1; min-width: 0; }
+  .ft .m { color: var(--muted); font-size: 11.5px; }
+
+  section { padding: 96px 0; }
+  .sec-head { max-width: 640px; margin-bottom: 48px; }
+  .sec-head .k { font-size: 13px; font-weight: 600; color: var(--brand); text-transform: uppercase; letter-spacing: .06em; }
+  .sec-head h2 { margin-top: 10px; font-size: 36px; line-height: 1.15; letter-spacing: -.02em; font-weight: 650; }
+  .sec-head p { margin-top: 14px; font-size: 16px; line-height: 1.6; color: var(--text2); }
+
+  /* Capabilities */
+  .caps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .cap { padding: 24px; display: grid; gap: 14px; align-content: start; }
+  .cap h3 { font-size: 18px; font-weight: 600; }
+  .cap p { color: var(--text2); line-height: 1.6; }
+  .cap ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; color: var(--text2); }
+  .cap li { display: flex; gap: 8px; }
+  .cap li .ico { width: 16px; height: 16px; color: var(--ok); margin-top: 2px; }
+  .cap-vis { height: 150px; border-radius: 12px; background: var(--page); border: 1px solid var(--border); padding: 14px; overflow: hidden; font-size: 12px; }
+
+  /* Workflow */
+  .flow-sec { background: var(--page); }
+  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; position: relative; }
+  .step { padding: 22px; position: relative; }
+  .step .n { width: 28px; height: 28px; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; font-weight: 600; font-size: 13px; }
+  .step h3 { margin-top: 16px; font-size: 16px; font-weight: 600; }
+  .step p { margin-top: 6px; color: var(--text2); line-height: 1.55; }
+  .step .tags { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .step:not(:last-child)::after { content: ""; position: absolute; right: -16px; top: 34px; width: 12px; height: 12px; border-top: 2px solid var(--border-strong); border-right: 2px solid var(--border-strong); transform: rotate(45deg); }
+
+  /* Also included */
+  .more { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .more > div { background: var(--bg); padding: 22px; display: flex; gap: 14px; }
+  .more h4 { font-size: 15px; font-weight: 600; }
+  .more p { color: var(--muted); margin-top: 4px; line-height: 1.5; }
+
+  /* CTA + footer */
+  .cta { padding: 0 0 96px; }
+  .cta-box { border-radius: 24px; background: var(--text); color: #fff; padding: 56px; display: flex; align-items: center; gap: 32px; }
+  .cta-box h2 { font-size: 34px; line-height: 1.15; letter-spacing: -.02em; font-weight: 650; }
+  .cta-box p { color: #c5c9d1; margin-top: 10px; font-size: 16px; }
+  .cta-box .btn-primary { margin-left: auto; }
+  footer { border-top: 1px solid var(--border); padding: 40px 0; color: var(--muted); font-size: 13px; }
+  footer .wrap { display: flex; gap: 48px; align-items: flex-start; }
+  footer nav { display: grid; gap: 8px; }
+  footer nav b { color: var(--text); font-weight: 600; margin-bottom: 2px; }
+  footer nav a { color: var(--muted); }
+  footer .copy { margin-left: auto; text-align: right; }
+
+  /* ---------- Mobile (390px) — real reflow ---------- */
+  @media (max-width: 767px) {
+    .wrap { padding: 0 20px; }
+    .nav .wrap { height: 56px; gap: 12px; }
+    .nav-links { display: none; }
+    .nav-right .btn-ghost { display: none; }
+    .nav-menu { display: inline-flex; }
+    .mnav { display: block; position: fixed; top: 56px; left: 0; right: 0; background: var(--bg); border-bottom: 1px solid var(--border); padding: 8px 12px 16px; z-index: 19; box-shadow: var(--shadow-pop); }
+    .mnav[hidden] { display: none; }
+    .mnav a { display: flex; height: 44px; align-items: center; padding: 0 8px; color: var(--text); font-weight: 500; border-radius: 8px; }
+    .hero { padding-top: 40px; }
+    .hero-copy { text-align: left; }
+    .hero h1 { font-size: 36px; line-height: 1.12; }
+    .hero .lede { font-size: 16px; margin-left: 0; }
+    .hero-cta { flex-direction: column; align-items: stretch; }
+    .hero-cta .btn { width: 100%; }
+    .shot { margin-top: 36px; margin-right: -20px; }
+    .browser { border-radius: 14px 0 0 0; border-right: 0; }
+    .browser-url { display: none; }
+    .app { grid-template-columns: 1fr; min-height: 300px; }
+    .app-side { display: none; }
+    .board { grid-template-columns: repeat(4, 200px); }
+    .float-today { position: relative; right: auto; top: auto; width: auto; margin: -60px 20px 0 0; }
+    section { padding: 64px 0; }
+    .sec-head { margin-bottom: 28px; }
+    .sec-head h2 { font-size: 28px; }
+    .caps, .more { grid-template-columns: 1fr; }
+    .flow { grid-template-columns: 1fr; gap: 12px; }
+    .step { display: grid; grid-template-columns: 28px 1fr; column-gap: 14px; padding: 18px; }
+    .step h3 { margin-top: 3px; }
+    .step p, .step .tags { grid-column: 2; }
+    .step:not(:last-child)::after { right: auto; left: 31px; top: auto; bottom: -11px; width: 8px; height: 8px; transform: rotate(135deg); }
+    .cta { padding-bottom: 64px; }
+    .cta-box { flex-direction: column; align-items: stretch; padding: 32px 24px; border-radius: 20px; gap: 20px; }
+    .cta-box h2 { font-size: 26px; }
+    .cta-box .btn-primary { margin-left: 0; }
+    footer .wrap { flex-direction: column; gap: 24px; }
+    footer .copy { margin-left: 0; text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="logo" href="landing.html"><span class="logo-mark"></span>Relay <span class="ph">[placeholder]</span></a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+    </nav>
+    <div class="nav-right">
+      <a class="btn btn-ghost" href="#how">See how it works</a>
+      <a class="btn btn-primary" href="login.html">Sign in</a>
+      <button class="btn btn-icon btn-ghost nav-menu" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mnav" id="menuBtn"><i data-i="menu"></i></button>
+    </div>
+  </div>
+</header>
+<div class="mnav" id="mnav" hidden>
+  <a href="#features">Features</a>
+  <a href="#how">How it works</a>
+</div>
+
+<main>
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero-copy">
+        <span class="eyebrow"><i data-i="kanban"></i> Sales CRM</span>
+        <h1>Know which deal <span>needs you today.</span></h1>
+        <p class="lede">Leads, conversations and quotes in one pipeline — with today's calls, meetings and overdue follow-ups waiting at the top of your screen.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary btn-lg" href="login.html">Sign in <i data-i="arrow"></i></a>
+          <a class="btn btn-lg" href="#how">See how it works</a>
+        </div>
+        <p class="hero-note">Accounts are created by your workspace admin.</p>
+      </div>
+
+      <div class="shot" aria-label="Product preview: leads board">
+        <div class="browser">
+          <div class="browser-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="browser-url">app.relay.example/leads</span></div>
+          <div class="app">
+            <div class="app-side">
+              <div class="it"><i data-i="home"></i>Dashboard</div>
+              <div class="it on"><i data-i="kanban"></i>Leads</div>
+              <div class="it"><i data-i="quote"></i>Quotes</div>
+              <div class="it"><i data-i="mail"></i>Mail</div>
+              <div class="it"><i data-i="calendar"></i>Activities</div>
+              <div class="it"><i data-i="users"></i>Contacts</div>
+              <div class="it"><i data-i="box"></i>Products</div>
+            </div>
+            <div class="app-main">
+              <div class="app-head"><b>Leads</b><span class="tag">Default Pipeline</span><span class="tag">64 open · $318,450</span></div>
+              <div class="board">
+                <div>
+                  <div class="col-h"><span>New</span><span class="num">22</span></div>
+                  <div class="lc"><b>Website redesign inquiry</b><span class="m">Meridian Studio</span><div class="row"><span class="num">$4,800</span><span class="av" style="background:#2563eb">AM</span></div></div>
+                  <div class="lc"><b>Route planning pilot</b><span class="m">Atlas Freight</span><div class="row"><span class="num">$7,200</span><span class="av" style="background:#7c3aed">JR</span></div></div>
+                </div>
+                <div>
+                  <div class="col-h"><span>Follow Up</span><span class="num">18</span></div>
+                  <div class="lc drag"><b>Clinic scheduling bundle</b><span class="m">Harbor &amp; Pine Dental</span><div class="row"><span class="num">$6,400</span><span class="av" style="background:#2563eb">AM</span></div></div>
+                  <div class="lc"><b>Tour booking add-on</b><span class="m">Alpenblick Tours</span><div class="row"><span class="num">$3,900</span><span class="av" style="background:#0891b2">SK</span></div></div>
+                </div>
+                <div>
+                  <div class="col-h"><span>Prospect</span><span class="num">14</span></div>
+                  <div class="lc"><b>Annual support plan</b><span class="m">Kestrel Analytics</span><div class="row"><span class="num">$9,600</span><span class="tag tag-risk">Idle 12d</span></div></div>
+                  <div class="lc"><b>Field sensor rollout</b><span class="m">Fieldwise Agritech</span><div class="row"><span class="num">$15,000</span><span class="av" style="background:#7c3aed">JR</span></div></div>
+                </div>
+                <div>
+                  <div class="col-h"><span>Negotiation</span><span class="num">10</span></div>
+                  <div class="lc"><b>Fleet tracking – 40 seats</b><span class="m">Northgate Couriers</span><div class="row"><span class="num">$24,000</span><span class="tag tag-risk">Idle 18d</span></div></div>
+                  <div class="lc"><b>Renewal + 10 seats</b><span class="m">Brightline Logistics</span><div class="row"><span class="num">$16,500</span><span class="av" style="background:#2563eb">AM</span></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="float-today" aria-hidden="true">
+          <h4><span>Today</span><span class="tag tag-risk">2 overdue</span></h4>
+          <div class="ft"><span class="card-icon"><i data-i="phone"></i></span><div><b>Renewal pricing call</b><div class="m">Priya Raman · Brightline</div></div><span class="tag tag-risk">2d late</span></div>
+          <div class="ft"><span class="card-icon"><i data-i="calendar"></i></span><div><b>Discovery call</b><div class="m">Mei Lin · Harbor &amp; Pine</div></div><span class="tag tag-warn">10:30</span></div>
+          <div class="ft"><span class="card-icon"><i data-i="coffee"></i></span><div><b>Lunch with Marco</b><div class="m">Atlas Freight</div></div><span class="tag tag-warn">12:30</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section id="features">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="k">What you get</span>
+        <h2>Everything your sales team touches, in one place.</h2>
+        <p>Not another spreadsheet tab. Every lead keeps its emails, calls, notes, files and quotes on one record.</p>
+      </div>
+      <div class="caps">
+        <article class="card cap">
+          <div class="cap-vis" aria-hidden="true">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+              <div><div class="col-h"><span>Follow Up</span></div><div class="lc"><b>Tour add-on</b><span class="m">$3,900</span></div></div>
+              <div><div class="col-h"><span>Prospect</span></div><div class="lc"><b>Support plan</b><span class="tag tag-risk">Idle 12d</span></div></div>
+              <div><div class="col-h"><span>Won</span></div><div class="lc"><b>Onboarding</b><span class="tag tag-ok"><i data-i="check"></i>Won</span></div></div>
+            </div>
+          </div>
+          <span class="card-icon"><i data-i="kanban"></i></span>
+          <h3>Lead pipeline board</h3>
+          <p>Drag leads across stages, run more than one pipeline, and see which deals have gone quiet.</p>
+          <ul>
+            <li><i data-i="check"></i>Board and table views</li>
+            <li><i data-i="check"></i>Custom stages and win probability</li>
+            <li><i data-i="check"></i>Idle-lead flags per pipeline</li>
+          </ul>
+        </article>
+        <article class="card cap">
+          <div class="cap-vis" aria-hidden="true">
+            <div class="ft" style="border-top:0;padding-top:0"><span class="card-icon"><i data-i="phone"></i></span><div><b>Renewal pricing call</b><div class="m">Overdue · Oct 31</div></div><span class="tag tag-risk">2d late</span></div>
+            <div class="ft"><span class="card-icon"><i data-i="users"></i></span><div><b>Product demo</b><div class="m">Today · 2:00 PM</div></div><span class="tag tag-warn">Today</span></div>
+            <div class="ft"><span class="card-icon"><i data-i="coffee"></i></span><div><b>Lunch with Marco</b><div class="m">Today · 12:30 PM</div></div><span class="tag tag-warn">Today</span></div>
+          </div>
+          <span class="card-icon"><i data-i="calendar"></i></span>
+          <h3>Activities &amp; follow-ups</h3>
+          <p>Schedule calls, meetings and lunches against a lead, then see what's due and what's overdue the moment you sign in.</p>
+          <ul>
+            <li><i data-i="check"></i>Shared activity calendar</li>
+            <li><i data-i="check"></i>Notes and files on every lead</li>
+            <li><i data-i="check"></i>Today and overdue list on the dashboard</li>
+          </ul>
+        </article>
+        <article class="card cap">
+          <div class="cap-vis" aria-hidden="true" style="display:grid;gap:8px">
+            <div class="lc" style="margin:0"><b>Re: Fleet tracking quote</b><span class="m">daniel@northgate.example · linked to lead</span></div>
+            <div class="lc" style="margin:0;display:flex;align-items:center;gap:8px"><span class="card-icon" style="width:26px;height:26px"><i data-i="code"></i></span><span><b>Contact us form</b><span class="m">3 new leads this week</span></span></div>
+          </div>
+          <span class="card-icon"><i data-i="mail"></i></span>
+          <h3>Email &amp; web forms</h3>
+          <p>Send and receive email right on the lead, and embed a web form on your site so new inquiries land in your pipeline.</p>
+          <ul>
+            <li><i data-i="check"></i>Inbox, drafts and sent mail</li>
+            <li><i data-i="check"></i>Reusable email templates</li>
+            <li><i data-i="check"></i>Embeddable web forms</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="flow-sec" id="how">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="k">How it works</span>
+        <h2>From first message to signed deal.</h2>
+        <p>One lead record follows the deal the whole way, so nobody has to ask "where are we with this one?"</p>
+      </div>
+      <ol class="flow" style="list-style:none;margin:0;padding:0">
+        <li class="card step"><span class="n">1</span><h3>A lead comes in</h3><p>From a web form, an email, a CSV import, or added by hand.</p><div class="tags"><span class="tag">Web Form</span><span class="tag">Email</span><span class="tag">Import</span></div></li>
+        <li class="card step"><span class="n">2</span><h3>Follow up</h3><p>Log calls, meetings and lunches. Notes and files stay on the lead.</p><div class="tags"><span class="tag">Call</span><span class="tag">Meeting</span><span class="tag">Lunch</span></div></li>
+        <li class="card step"><span class="n">3</span><h3>Send a quote</h3><p>Build a quote from your product catalog and export it as a PDF.</p><div class="tags"><span class="tag">Products</span><span class="tag">PDF</span></div></li>
+        <li class="card step"><span class="n">4</span><h3>Win and review</h3><p>Mark it won and see revenue by source and type on your dashboard.</p><div class="tags"><span class="tag tag-ok"><i data-i="trophy"></i>Won</span><span class="tag">Reports</span></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="k">Also included</span>
+        <h2>The rest of the toolkit.</h2>
+      </div>
+      <div class="more">
+        <div><span class="card-icon"><i data-i="building"></i></span><div><h4>Contacts &amp; organizations</h4><p>People and companies, linked to their leads and quotes.</p></div></div>
+        <div><span class="card-icon"><i data-i="box"></i></span><div><h4>Products &amp; inventory</h4><p>A product catalog with stock across warehouses.</p></div></div>
+        <div><span class="card-icon"><i data-i="zap"></i></span><div><h4>Automation &amp; webhooks</h4><p>Trigger actions when a lead, person or activity changes.</p></div></div>
+        <div><span class="card-icon"><i data-i="shield"></i></span><div><h4>Roles &amp; permissions</h4><p>Control who sees and edits what, by role and group.</p></div></div>
+        <div><span class="card-icon"><i data-i="upload"></i></span><div><h4>Import &amp; export</h4><p>Bring in contacts and leads from CSV or Excel.</p></div></div>
+        <div><span class="card-icon"><i data-i="globe"></i></span><div><h4>10 interface languages</h4><p>Including Simplified Chinese, plus a dark theme.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="cta">
+    <div class="wrap">
+      <div class="cta-box">
+        <div>
+          <h2>Your pipeline is waiting.</h2>
+          <p>Sign in to see today's follow-ups. No account yet? Ask your workspace admin for an invite.</p>
+        </div>
+        <a class="btn btn-primary btn-lg" href="login.html">Sign in <i data-i="arrow"></i></a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <a class="logo" href="landing.html"><span class="logo-mark"></span>Relay <span class="ph">[placeholder]</span></a>
+    <nav aria-label="Product"><b>Product</b><a href="#features">Features</a><a href="#how">How it works</a><a href="login.html">Sign in</a></nav>
+    <nav aria-label="Legal"><b>Legal</b><a href="#" onclick="Hifi.toast('Legal pages are not part of this mockup.');return false">Privacy</a><a href="#" onclick="Hifi.toast('Legal pages are not part of this mockup.');return false">Terms</a></nav>
+    <div class="copy">© 2026 [Company name placeholder]</div>
+  </div>
+</footer>
+
+<script src="assets/hifi.js"></script>
+<script>
+  const nav = document.getElementById('nav');
+  addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 8), { passive: true });
+  const mb = document.getElementById('menuBtn'), mn = document.getElementById('mnav');
+  mb.addEventListener('click', () => { mn.hidden = !mn.hidden; mb.setAttribute('aria-expanded', String(!mn.hidden)); });
+  mn.addEventListener('click', e => { if (e.target.tagName === 'A') { mn.hidden = true; mb.setAttribute('aria-expanded', 'false'); } });
+</script>
+</body>
+</html>

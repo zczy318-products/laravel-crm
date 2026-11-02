@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRM 高保真 v1 · landing → 登录 → dashboard</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/hifi.css">
+<style>
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 40px 32px 80px; display: grid; gap: 28px; }
+  header h1 { font-size: 28px; line-height: 36px; font-weight: 600; margin-top: 10px; }
+  header p { color: var(--text2); margin-top: 6px; max-width: 860px; }
+  h2 { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+  .pages { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+  .pg { padding: 20px; display: grid; gap: 12px; align-content: start; }
+  .pg h3 { font-size: 16px; font-weight: 600; }
+  .pg p { color: var(--muted); font-size: 13px; }
+  .pg .links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .phone { justify-self: center; width: calc(390px * .78 + 16px); height: calc(844px * .78 + 16px); border-radius: 40px; background: #17181c; padding: 8px; overflow: hidden; }
+  .phone iframe { width: 390px; height: 844px; border: 0; border-radius: 32px; transform: scale(.78); transform-origin: 0 0; background: #fff; }
+  .states { display: flex; flex-wrap: wrap; gap: 6px; }
+  .states a { font-size: 12px; }
+  .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .box { padding: 20px 22px; }
+  .box ol, .box ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; color: var(--text2); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 9px 10px; border-top: 1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; background: var(--band); }
+  code { font-size: 12px; background: var(--current); padding: 1px 5px; border-radius: 5px; }
+  @media (max-width: 1000px) { .pages, .cols2 { grid-template-columns: 1fr; } .wrap { padding: 24px 16px 60px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="tag tag-warn">待 Andrew 批准 · 批准前不实现</span>
+    <h1>CRM 高保真 v1：landing → 登录 → dashboard</h1>
+    <p>基于 Krayin CRM v2.2.7（仓库 <code>zczy318-products/laravel-crm</code>，分支 <code>2.2</code>）。3 个页面 × 桌面 + 移动（390px 真重排）。品牌名未定，暂用 “Relay” 并标 <span class="ph">[placeholder]</span>。界面文案为英文，数据是虚构的样例数据。</p>
+  </header>
+
+  <section>
+    <h2>6 张稿子</h2>
+    <div class="pages">
+      <div class="card pg">
+        <h3>1 · Landing（新做）</h3>
+        <p>顶栏 → Hero（价值主张 + 产品界面）→ 3 个核心能力 → 工作流 → 其他能力 → CTA → 页脚。唯一主按钮是 “Sign in”。</p>
+        <div class="links"><a class="btn btn-sm btn-primary" href="landing.html">桌面版</a><a class="btn btn-sm" href="frame.html?p=landing.html">移动版 390</a></div>
+        <div class="phone"><iframe src="landing.html" title="Landing 移动版" loading="lazy"></iframe></div>
+      </div>
+      <div class="card pg">
+        <h3>2 · 登录（重做）</h3>
+        <p>桌面左品牌右表单，移动只留表单。密码 <code>demo1234</code> 能登录，其他密码会显示“账号或密码错误”。</p>
+        <div class="links"><a class="btn btn-sm btn-primary" href="login.html">桌面版</a><a class="btn btn-sm" href="frame.html?p=login.html">移动版 390</a></div>
+        <div class="states">
+          <a href="login.html?state=invalid">校验错误</a>·<a href="login.html?state=wrong">账号密码错误</a>·<a href="login.html?state=submitting">提交中</a>·<a href="login.html?state=forgot">忘记密码</a>·<a href="login.html?state=sent">已发送</a>
+        </div>
+        <div class="phone"><iframe src="login.html" title="登录 移动版" loading="lazy"></iframe></div>
+      </div>
+      <div class="card pg">
+        <h3>3 · Dashboard（重做）</h3>
+        <p>今日待办（到期/逾期活动 + 该跟进的线索）→ 4 个关键数字 → 管道阶段 + 线索趋势 → 次要报表。侧栏可折叠，移动端底部 Tab 栏。</p>
+        <div class="links"><a class="btn btn-sm btn-primary" href="dashboard.html">桌面版</a><a class="btn btn-sm" href="frame.html?p=dashboard.html">移动版 390</a></div>
+        <div class="states">
+          <a href="dashboard.html?state=data">有数据</a>·<a href="dashboard.html?state=empty">新账号空状态</a>·<a href="dashboard.html?state=loading">加载骨架屏</a>
+        </div>
+        <div class="phone"><iframe src="dashboard.html" title="Dashboard 移动版" loading="lazy"></iframe></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cols2">
+    <div class="card box">
+      <h2>怎么点完整个流程</h2>
+      <ol>
+        <li>打开 <a href="landing.html">Landing</a>，点右上角或 Hero 里的 <b>Sign in</b>。</li>
+        <li>登录页直接点 <b>Sign in</b> → 看到校验错误；随便填邮箱和错误密码 → 看到“账号或密码错误”。</li>
+        <li>点 <b>Forgot password?</b> → 填邮箱 → <b>Send reset link</b> → 看到“已发送”页 → 回到登录。</li>
+        <li>密码填 <code>demo1234</code>（或右下角紫色 <b>◐ States → Fill demo login</b>）→ 提交中 → 进入 Dashboard（先显示骨架屏，再出数据）。</li>
+        <li>Dashboard 里：勾选活动前的圆圈完成它（可撤销）；点某个阶段、KPI 或 “Open” → 跳到占位页，说明去向；右下角 <b>◐ States</b> 切换有数据 / 空状态 / 加载中。</li>
+      </ol>
+      <p class="muted" style="margin-top:10px;font-size:13px">右下角紫色虚线的 “◐ States” 只是评审用的状态切换器，不属于设计。</p>
+    </div>
+    <div class="card box">
+      <h2>需要 Andrew 定的事</h2>
+      <ol>
+        <li><b>品牌名</b>：现在是占位名 “Relay”。定了之后替换 logo 和文案。</li>
+        <li><b>“Continue with Google” 要不要做</b>：现在只是画出来的位置。Krayin 自带的 Google 集成用于日历和通讯录同步，没有 Google 登录，要做需要另外开发。</li>
+        <li><b>Landing 的定位</b>：现在按对外产品来做。如果 CRM 只给内部用，可以去掉 landing，<code>/</code> 直接进登录页。</li>
+        <li><b>没有自助注册</b>：Krayin 没有注册功能，所以全站只有 “Sign in”，并提示“找管理员开通账号”。如果要开放试用，需要另做注册和多租户。</li>
+        <li><b>暗色模式</b>：Krayin 本身有暗色模式，但公司 Web 设计模板还没有审定过暗色，这一版只出浅色。</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="card box">
+    <h2>改前（现状）</h2>
+    <p class="muted" style="margin-bottom:10px">没有截到实例截图：这次的运行环境没有 PHP、MySQL 和 Docker，跑不起 Krayin（这是票上的可选步骤，花费 $0，所以跳过了）。下面的现状是照 Blade 源码整理的。</p>
+    <table>
+      <tr><th style="width:120px">页面</th><th>现状（Krayin v2.2.7）</th><th>这一版改成</th></tr>
+      <tr><td>Landing</td><td>不存在，<code>/</code> 直接 302 跳到 <code>/admin/login</code>。</td><td>新做营销首页，只写 Krayin 真有的功能。</td></tr>
+      <tr><td>登录</td><td>灰底上一张白卡：Krayin logo、“Sign In”、邮箱和密码（输入框固定 254px 宽）、忘记密码、按钮，底部写着 “Powered by Krayin, a Webkul product”。错误提示只有字段下的校验文字，没有加载状态，也没有“记住我”。<br><small class="muted">源码：<code>packages/Webkul/Admin/src/Resources/views/sessions/login.blade.php</code></small></td><td>左边品牌区，右边表单；移动端只留表单。加了“记住我”、显示密码、账号密码错误提示、提交中、忘记密码 → 已发送，并预留 Google 登录。去掉了 Powered by。</td></tr>
+      <tr><td>Dashboard</td><td>8 个统计组件权重一样：收入、6 个总数卡、线索趋势、热销产品、头部客户、阶段漏斗、按来源收入、按类型收入。没有“今天要做什么”，新装系统时全是 0 和空图，侧栏只有图标。<br><small class="muted">源码：<code>views/dashboard/index.blade.php</code> + <code>views/dashboard/index/*.blade.php</code></small></td><td>先放今日待办，再放 4 个关键数字、管道阶段和趋势，次要报表放到下面。加了空状态引导和骨架屏；侧栏改成图标 + 文字，可以折叠；移动端用底部 Tab 栏。</td></tr>
+    </table>
+  </section>
+
+  <section class="card box">
+    <h2>功能真实性对照（稿子里写的功能都能对上 Krayin 的模块）</h2>
+    <table>
+      <tr><th>稿子里的说法</th><th>Krayin 里对应的东西</th></tr>
+      <tr><td>Lead pipeline board、多条管道、阶段赢单概率、停滞线索标记</td><td><code>Lead</code> 模块：看板 + 表格视图；<code>lead_pipelines</code> 的 <code>rotten_days</code>；阶段带 <code>probability</code></td></tr>
+      <tr><td>默认阶段 New / Follow Up / Prospect / Negotiation / Won / Lost；来源 Web Form / Email / Direct / Phone / Web；类型 New / Existing Business</td><td><code>Installer/…/Seeders/Lead/*Seeder.php</code> 的默认数据</td></tr>
+      <tr><td>Call / Meeting / Lunch 活动、日历、备注、文件</td><td><code>Activity</code> 模块（活动类型包括 call、meeting、lunch、note、file、email）</td></tr>
+      <tr><td>收件箱、草稿、已发送，邮件模板，嵌入式 Web 表单</td><td><code>Email</code>（IMAP / Sendgrid 收信）、<code>EmailTemplate</code>、<code>WebForm</code></td></tr>
+      <tr><td>报价单导出 PDF、产品目录、多仓库库存</td><td><code>Quote</code>、<code>Product</code> + <code>Warehouse</code></td></tr>
+      <tr><td>自动化和 Webhook、角色权限、CSV/Excel 导入导出、10 种界面语言（含简体中文）、暗色主题</td><td><code>Automation</code>、<code>User</code> 角色和组、<code>DataTransfer</code>、<code>lang/zh_CN</code> 等、Admin 暗色模式</td></tr>
+      <tr><td>重置链接 60 分钟内有效</td><td><code>config/auth.php</code> 里 <code>passwords.users.expire = 60</code></td></tr>
+      <tr><td>Dashboard 导出 PDF、管道选择、日期范围</td><td>现有 dashboard 顶部就有这三个功能</td></tr>
+    </table>
+    <p class="muted" style="margin-top:10px;font-size:13px">稿子里没有用户数、客户 logo 和用户评价。公司名和数字都是虚构的样例数据，邮箱都用 <code>.example</code> 域名。“Today / 该跟进”这两块要新写查询（按到期时间查活动、按最后一次活动时间查线索），需要的数据 Krayin 里都有。</p>
+  </section>
+
+  <section class="card box">
+    <h2>设计依据和偏离</h2>
+    <ul>
+      <li>颜色、字号、间距、圆角、按钮、输入框、卡片、标签、toast 和状态都用公司 <a href="https://app.notion.com/p/3f93e1354311815497d6d6779d61680d">Web 设计模板 v1</a> 的数值；只有一个强调色（蓝 <code>#1f66e5</code>），字体是系统字体，没有加载网络字体。</li>
+      <li>Dashboard 用模板里的 C 看板页原型：侧栏 264px（可折叠到 72px），顶栏 56px，KPI 卡带口径说明，“胜率”样本不够时显示 “Can't calculate yet”，不显示 0。</li>
+      <li>图表都是单系列实心蓝（<code>#2563eb</code>），只有“按类型收入”用了第二种颜色（<code>#db2777</code>），色弱检查通过（ΔE 18.7）。图表不加动画，悬停有提示。</li>
+      <li><b>偏离 1</b>：模板不管移动端、landing 和登录页。这几处按票的要求做：landing 和登录页更有品牌感，但颜色和字体保持一致。</li>
+      <li><b>偏离 2</b>：稿子是手写 CSS，没有加载 Tailwind 和 Preline 的 CDN（不依赖外网，国内也能打开）。数值都可以一一对应到 Tailwind 类名；实现时用 Tailwind + Preline 免费组件，写成 view override，不改 Krayin 核心文件。</li>
+    </ul>
+  </section>
+</div>
+<script src="assets/hifi.js"></script>
+</body>
+</html>

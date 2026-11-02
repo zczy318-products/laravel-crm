@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in — Relay [placeholder] (hi-fi v1)</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="assets/hifi.css">
+<style>
+  body { background: var(--bg); min-height: 100vh; }
+  .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(480px, 560px); min-height: 100vh; }
+
+  /* Brand side */
+  .brand { background: var(--page); border-right: 1px solid var(--border); padding: 40px 56px; display: flex; flex-direction: column; overflow: hidden; }
+  .brand-copy { margin-top: auto; max-width: 520px; }
+  .brand h2 { font-size: 40px; line-height: 1.1; letter-spacing: -.025em; font-weight: 650; }
+  .brand h2 span { color: var(--brand); }
+  .brand p { margin-top: 16px; font-size: 16px; line-height: 1.6; color: var(--text2); }
+  .brand ul { list-style: none; padding: 0; margin: 24px 0 0; display: grid; gap: 10px; color: var(--text2); }
+  .brand li { display: flex; gap: 10px; align-items: center; }
+  .brand li .ico { color: var(--brand); width: 18px; height: 18px; }
+  .preview { margin-top: 40px; margin-bottom: auto; max-width: 460px; background: var(--bg); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow-pop); padding: 16px 18px; font-size: 13px; }
+  .preview h4 { display: flex; justify-content: space-between; align-items: center; font-size: 14px; margin-bottom: 6px; }
+  .pv { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--border); }
+  .pv:first-of-type { border-top: 0; }
+  .pv .card-icon { width: 30px; height: 30px; border-radius: 8px; }
+  .pv .card-icon .ico { width: 15px; height: 15px; }
+  .pv > div { flex: 1; min-width: 0; }
+  .pv .m { color: var(--muted); font-size: 12px; }
+  .brand-foot { margin-top: 32px; font-size: 12px; color: var(--muted); }
+
+  /* Form side */
+  .form-side { display: flex; flex-direction: column; padding: 40px 56px; }
+  .form-top { display: flex; justify-content: space-between; align-items: center; }
+  .form-top .m-logo { display: none; }
+  .back { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); font-size: 13px; font-weight: 500; }
+  .back .ico { width: 16px; height: 16px; }
+  .form-box { width: 100%; max-width: 380px; margin: auto; padding: 40px 0; }
+  .form-box h1 { font-size: 28px; line-height: 36px; font-weight: 600; letter-spacing: -.01em; }
+  .form-box .sub { margin-top: 6px; color: var(--muted); }
+  .stack { display: grid; gap: 18px; margin-top: 28px; }
+  .or { display: flex; align-items: center; gap: 12px; color: var(--faint); font-size: 12px; }
+  .or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+  .row-between { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+  .g-btn .g { width: 18px; height: 18px; }
+  .form-foot { font-size: 13px; color: var(--muted); text-align: center; }
+  .sent-ico { width: 52px; height: 52px; border-radius: 14px; background: var(--ok-bg); color: var(--ok); display: grid; place-items: center; }
+  .sent-ico .ico { width: 26px; height: 26px; }
+  .legal { font-size: 12px; color: var(--muted); text-align: center; }
+  [data-view][hidden] { display: none !important; }
+
+  /* ---------- Mobile: form only, logo on top ---------- */
+  @media (max-width: 899px) {
+    .split { grid-template-columns: 1fr; }
+    .brand { display: none; }
+    .form-side { padding: 16px 20px 24px; min-height: 100vh; }
+    .form-top .m-logo { display: inline-flex; }
+    .form-top .logo { font-size: 16px; }
+    .form-box { margin: 0 auto; padding: 36px 0 24px; max-width: none; }
+    .form-box h1 { font-size: 24px; line-height: 32px; }
+    .stack { gap: 16px; margin-top: 24px; }
+    .input, .btn { height: 44px; }
+    .input-wrap .btn-icon { height: 36px; }
+    .legal { margin-top: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="split">
+  <aside class="brand" aria-label="About Relay">
+    <a class="logo" href="landing.html"><span class="logo-mark"></span>Relay <span class="ph">[placeholder]</span></a>
+    <div class="brand-copy">
+      <h2>Pick up right where <span>your deals left off.</span></h2>
+      <p>Your pipeline, today's follow-ups and every conversation with a customer — one sign-in away.</p>
+    </div>
+    <div class="preview" aria-hidden="true">
+      <h4><span>Due today</span><span class="tag tag-risk">2 overdue</span></h4>
+      <div class="pv"><span class="card-icon"><i data-i="phone"></i></span><div><b>Renewal pricing call</b><div class="m">Priya Raman · Brightline Logistics</div></div><span class="tag tag-risk">2d late</span></div>
+      <div class="pv"><span class="card-icon"><i data-i="phone"></i></span><div><b>Discovery call</b><div class="m">Mei Lin · Harbor &amp; Pine Dental</div></div><span class="tag tag-warn">10:30 AM</span></div>
+      <div class="pv"><span class="card-icon"><i data-i="users"></i></span><div><b>Product demo</b><div class="m">Tom Becker · Fieldwise Agritech</div></div><span class="tag tag-warn">2:00 PM</span></div>
+    </div>
+    <div class="brand-foot">© 2026 [Company name placeholder]</div>
+  </aside>
+
+  <main class="form-side">
+    <div class="form-top">
+      <a class="logo m-logo" href="landing.html"><span class="logo-mark"></span>Relay <span class="ph">[placeholder]</span></a>
+      <a class="back" href="landing.html"><i data-i="left"></i>Home</a>
+    </div>
+
+    <!-- View: sign in -->
+    <div class="form-box" data-view="signin">
+      <h1>Sign in</h1>
+      <p class="sub">Welcome back. Use your work email.</p>
+      <form class="stack" id="signinForm" novalidate>
+        <div class="alert alert-err" id="credErr" role="alert" hidden>
+          <i data-i="alert"></i>
+          <div><b>Email or password is incorrect.</b><br>Check both and try again, or <a href="#" data-go="forgot">reset your password</a>.</div>
+        </div>
+        <button class="btn btn-block g-btn" type="button" id="googleBtn">
+          <svg class="g" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          Continue with Google
+        </button>
+        <div class="or">or</div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input class="input" id="email" name="email" type="email" autocomplete="email" placeholder="you@company.com" aria-describedby="emailErr">
+          <div class="field-error" id="emailErr" hidden><i data-i="alert"></i><span></span></div>
+        </div>
+        <div class="field">
+          <div class="label-row"><label for="password">Password</label><a href="#" data-go="forgot" style="font-size:13px">Forgot password?</a></div>
+          <div class="input-wrap">
+            <input class="input" id="password" name="password" type="password" autocomplete="current-password" placeholder="Your password" aria-describedby="pwErr">
+            <button class="btn btn-icon" type="button" id="pwToggle" aria-label="Show password" aria-pressed="false"><i data-i="eye"></i></button>
+          </div>
+          <div class="field-error" id="pwErr" hidden><i data-i="alert"></i><span></span></div>
+        </div>
+        <label class="check"><input type="checkbox" id="remember" checked> Remember me on this device</label>
+        <button class="btn btn-primary btn-block" type="submit" id="submitBtn">Sign in</button>
+        <p class="form-foot">No account? Ask your workspace admin for an invite.</p>
+      </form>
+    </div>
+
+    <!-- View: forgot password -->
+    <div class="form-box" data-view="forgot" hidden>
+      <a class="back" href="#" data-go="signin"><i data-i="left"></i>Back to sign in</a>
+      <h1 style="margin-top:20px">Reset your password</h1>
+      <p class="sub">Enter the email you sign in with. We'll send you a link to set a new password.</p>
+      <form class="stack" id="forgotForm" novalidate>
+        <div class="field">
+          <label for="fEmail">Email</label>
+          <input class="input" id="fEmail" type="email" autocomplete="email" placeholder="you@company.com" aria-describedby="fEmailErr">
+          <div class="field-error" id="fEmailErr" hidden><i data-i="alert"></i><span></span></div>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit" id="forgotBtn">Send reset link</button>
+      </form>
+    </div>
+
+    <!-- View: link sent -->
+    <div class="form-box" data-view="sent" hidden role="status">
+      <span class="sent-ico"><i data-i="mailcheck"></i></span>
+      <h1 style="margin-top:20px">Check your email</h1>
+      <p class="sub">If an account exists for <b id="sentTo" style="color:var(--text)">alex.morgan@northwind.example</b>, you'll get a reset link in a minute. The link works for 60 minutes.</p>
+      <div class="stack">
+        <a class="btn btn-primary btn-block" href="#" data-go="signin">Back to sign in</a>
+        <p class="form-foot">Didn't get it? Check spam, or <a href="#" id="resend">send it again</a>.</p>
+      </div>
+    </div>
+
+    <p class="legal">By signing in you agree to the <a href="#" onclick="Hifi.toast('Legal pages are not part of this mockup.');return false">Terms</a> and <a href="#" onclick="Hifi.toast('Legal pages are not part of this mockup.');return false">Privacy Policy</a>.</p>
+  </main>
+</div>
+
+<script src="assets/hifi.js"></script>
+<script>
+  const $ = id => document.getElementById(id);
+  const DEMO_EMAIL = 'alex.morgan@northwind.example', DEMO_PW = 'demo1234';
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  let proto;
+
+  function show(view) {
+    document.querySelectorAll('[data-view]').forEach(v => v.hidden = v.dataset.view !== view);
+    const first = document.querySelector('[data-view="' + view + '"] input, [data-view="' + view + '"] .btn-primary');
+    if (first && view !== 'signin') first.focus();
+  }
+  function setErr(input, box, msg) {
+    input.setAttribute('aria-invalid', msg ? 'true' : 'false');
+    box.hidden = !msg; box.querySelector('span').textContent = msg || '';
+  }
+  function validateEmail(input, box) {
+    const v = input.value.trim();
+    const msg = !v ? 'Enter your email address.' : !emailRe.test(v) ? 'Enter a valid email, like name@company.com.' : '';
+    setErr(input, box, msg); return !msg;
+  }
+  function validatePw() {
+    const msg = $('password').value ? '' : 'Enter your password.';
+    setErr($('password'), $('pwErr'), msg); return !msg;
+  }
+  function setSubmitting(on, btn, label) {
+    btn.classList.toggle('is-loading', on); btn.disabled = on;
+    btn.innerHTML = on ? '<span class="spinner" aria-hidden="true"></span>' + label : btn.dataset.label;
+    btn.closest('form').querySelectorAll('input, button:not([type=submit])').forEach(el => el.disabled = on);
+  }
+  ['submitBtn', 'forgotBtn'].forEach(id => $(id).dataset.label = $(id).textContent);
+
+  // Validate on blur; clear as soon as the value is fixed; never add new errors while typing.
+  $('email').addEventListener('blur', () => { if ($('email').value) validateEmail($('email'), $('emailErr')); });
+  $('email').addEventListener('input', () => { if ($('email').getAttribute('aria-invalid') === 'true' && emailRe.test($('email').value.trim())) setErr($('email'), $('emailErr'), ''); $('credErr').hidden = true; });
+  $('password').addEventListener('input', () => { if ($('password').value) setErr($('password'), $('pwErr'), ''); $('credErr').hidden = true; });
+  $('fEmail').addEventListener('input', () => { if ($('fEmail').getAttribute('aria-invalid') === 'true' && emailRe.test($('fEmail').value.trim())) setErr($('fEmail'), $('fEmailErr'), ''); });
+
+  $('pwToggle').addEventListener('click', () => {
+    const on = $('password').type === 'password';
+    $('password').type = on ? 'text' : 'password';
+    $('pwToggle').setAttribute('aria-pressed', String(on));
+    $('pwToggle').setAttribute('aria-label', on ? 'Hide password' : 'Show password');
+    $('pwToggle').innerHTML = Hifi.svg(on ? 'eyeoff' : 'eye').replace('<svg', '<svg class="ico"');
+  });
+
+  $('signinForm').addEventListener('submit', e => {
+    e.preventDefault();
+    $('credErr').hidden = true;
+    const ok = [validateEmail($('email'), $('emailErr')), validatePw()];
+    if (!ok[0]) return $('email').focus();
+    if (!ok[1]) return $('password').focus();
+    setSubmitting(true, $('submitBtn'), 'Signing in…'); proto.mark('submitting');
+    setTimeout(() => {
+      if ($('password').value === DEMO_PW) { location.href = 'dashboard.html?from=login'; return; }
+      setSubmitting(false, $('submitBtn'));
+      $('password').value = ''; $('credErr').hidden = false; $('password').focus(); proto.mark('wrong');
+    }, 1100);
+  });
+
+  $('forgotForm').addEventListener('submit', e => {
+    e.preventDefault();
+    if (!validateEmail($('fEmail'), $('fEmailErr'))) return $('fEmail').focus();
+    setSubmitting(true, $('forgotBtn'), 'Sending…');
+    setTimeout(() => { setSubmitting(false, $('forgotBtn')); $('sentTo').textContent = $('fEmail').value.trim(); show('sent'); proto.mark('sent'); }, 900);
+  });
+
+  document.addEventListener('click', e => {
+    const go = e.target.closest('[data-go]');
+    if (!go) return;
+    e.preventDefault();
+    if (go.dataset.go === 'forgot') { $('fEmail').value = $('email').value; setErr($('fEmail'), $('fEmailErr'), ''); }
+    show(go.dataset.go); proto.mark(go.dataset.go === 'signin' ? 'default' : go.dataset.go);
+  });
+  $('resend').addEventListener('click', e => { e.preventDefault(); Hifi.toast('Reset link sent again.'); });
+  $('googleBtn').addEventListener('click', () => Hifi.toast('Google sign-in is reserved in this design — not connected yet.'));
+
+  // Prototype state switcher
+  function reset() {
+    ['email', 'password'].forEach(id => { $(id).value = ''; $(id).disabled = false; });
+    setErr($('email'), $('emailErr'), ''); setErr($('password'), $('pwErr'), ''); $('credErr').hidden = true;
+    setSubmitting(false, $('submitBtn')); setSubmitting(false, $('forgotBtn'));
+  }
+  function setState(s) {
+    reset(); show(['forgot', 'sent'].includes(s) ? s : 'signin');
+    if (s === 'invalid') { $('email').value = 'alex.morgan@northwind'; validateEmail($('email'), $('emailErr')); validatePw(); }
+    if (s === 'wrong') { $('email').value = DEMO_EMAIL; $('credErr').hidden = false; }
+    if (s === 'submitting') { $('email').value = DEMO_EMAIL; $('password').value = DEMO_PW; setSubmitting(true, $('submitBtn'), 'Signing in…'); }
+    if (s === 'forgot') $('fEmail').value = DEMO_EMAIL;
+    if (s === 'sent') $('sentTo').textContent = DEMO_EMAIL;
+    proto.mark(s);
+  }
+  proto = Hifi.protoPanel({
+    states: [
+      { id: 'default', label: 'Default' }, { id: 'invalid', label: 'Validation error' },
+      { id: 'wrong', label: 'Wrong password' }, { id: 'submitting', label: 'Signing in' },
+      { id: 'forgot', label: 'Forgot password' }, { id: 'sent', label: 'Link sent' }
+    ],
+    onSet: setState,
+    extra: [{ label: 'Fill demo login', onClick: () => { setState('default'); $('email').value = DEMO_EMAIL; $('password').value = DEMO_PW; $('submitBtn').focus(); } }],
+    note: 'Password <b>demo1234</b> signs in. Any other password shows the "incorrect" state.'
+  });
+  setState(new URLSearchParams(location.search).get('state') || 'default');
+</script>
+</body>
+</html>
