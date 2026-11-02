@@ -28,6 +28,8 @@
   th { color: var(--muted); font-weight: 500; background: var(--band); }
   code { font-size: 12px; background: var(--current); padding: 1px 5px; border-radius: 5px; }
   @media (max-width: 1000px) { .pages, .cols2 { grid-template-columns: 1fr; } .wrap { padding: 24px 16px 60px; } }
+  /* Opened on a phone: drop the scaled device thumbnails (the buttons open each screen full-size) and let long text wrap */
+  @media (max-width: 600px) { .phone { display: none; } h1 { font-size: 24px; line-height: 32px; } header p, .pages p, td, code { overflow-wrap: anywhere; } table { display: block; overflow-x: auto; } .wrap > * { min-width: 0; } }
 </style>
 </head>
 <body>

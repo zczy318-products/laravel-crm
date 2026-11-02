@@ -166,9 +166,16 @@
     .content { padding: 18px 16px 104px; gap: 16px; }
     .page-head { align-items: flex-start; flex-direction: column; gap: 12px; }
     .page-head h1 { font-size: 22px; line-height: 30px; }
-    .head-ctl { margin-left: 0; width: 100%; overflow-x: auto; scrollbar-width: none; }
+    /* 390 review fix: range control wrapped to its own full-width row instead of clipping "Quarter" */
+    .head-ctl { margin-left: 0; width: 100%; flex-wrap: wrap; gap: 8px; }
     .head-ctl .export { display: none; }
-    .head-ctl > * { flex: none; }
+    .head-ctl > * { flex: 1 1 100%; }
+    .head-ctl > .btn { justify-content: flex-start; }
+    .head-ctl .seg { display: flex; }
+    .head-ctl .seg button { flex: 1; height: 36px; }
+    /* 44px touch target around the 22px done circle */
+    .done-btn { position: relative; }
+    .done-btn::after { content: ""; position: absolute; inset: -11px; }
     .card-head .btn-ghost { display: none; }
     .closed { flex-wrap: wrap; gap: 8px 16px; }
     .grid-today, .charts { grid-template-columns: minmax(0, 1fr); gap: 16px; }
@@ -302,7 +309,7 @@ const headCtl = (disabled) => `
   <div class="head-ctl">
     <button class="btn btn-sm" type="button" ${disabled ? 'disabled' : ''} onclick="Hifi.toast('Pipeline picker: Default Pipeline is the only pipeline in this sample.')"><i data-i="kanban"></i>Default Pipeline<i data-i="down"></i></button>
     <div class="seg" role="group" aria-label="Date range">
-      <button type="button" aria-pressed="false">7 days</button><button type="button" aria-pressed="true">30 days</button><button type="button" aria-pressed="false">Quarter</button>
+      <button type="button" ${disabled ? 'disabled' : ''} aria-pressed="false">7 days</button><button type="button" ${disabled ? 'disabled' : ''} aria-pressed="true">30 days</button><button type="button" ${disabled ? 'disabled' : ''} aria-pressed="false">Quarter</button>
     </div>
     <button class="btn btn-sm btn-ghost export" type="button" ${disabled ? 'disabled' : ''} onclick="Hifi.toast('Exports the dashboard as PDF.')"><i data-i="download"></i>Export PDF</button>
   </div>`;

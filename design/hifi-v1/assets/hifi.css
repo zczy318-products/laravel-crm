@@ -119,6 +119,7 @@ button, input, select { font: inherit; color: inherit; }
 /* Segmented control */
 .seg { display: inline-flex; padding: 3px; gap: 2px; border-radius: 10px; background: var(--current); }
 .seg button { height: 32px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; color: var(--text2); cursor: pointer; font-size: 13px; font-weight: 500; }
+.seg button[disabled] { color: var(--faint); cursor: default; }
 .seg button[aria-pressed="true"] { background: var(--bg); color: var(--text); font-weight: 600; box-shadow: 0 1px 2px rgba(23, 24, 28, .08); }
 
 /* Toast */
@@ -142,3 +143,4 @@ button, input, select { font: inherit; color: inherit; }
 .proto-panel .opts button { height: 28px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--border-ctl); background: #fff; cursor: pointer; font-size: 12px; }
 .proto-panel .opts button[aria-pressed="true"] { border-color: #7c3aed; background: #f5f0ff; color: #5b21b6; font-weight: 600; }
 .proto-panel h4 { font-size: 12px; font-weight: 600; color: #5b21b6; }
+@media (max-width: 767px) { .proto-toggle { height: 28px; padding: 0 10px; opacity: .92; } }
