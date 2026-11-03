@@ -109,7 +109,7 @@
         <div class="field">
           <label for="email">Email</label>
           <input class="input" id="email" name="email" type="email" autocomplete="email" placeholder="you@company.com" aria-describedby="emailErr">
-          <div class="field-error" id="emailErr" hidden><i data-i="alert"></i><span></span></div>
+          <div class="field-error" id="emailErr" hidden><i data-i="alert"></i><span class="msg"></span></div>
         </div>
         <div class="field">
           <div class="label-row"><label for="password">Password</label><a href="#" data-go="forgot" style="font-size:13px">Forgot password?</a></div>
@@ -117,7 +117,7 @@
             <input class="input" id="password" name="password" type="password" autocomplete="current-password" placeholder="Your password" aria-describedby="pwErr">
             <button class="btn btn-icon" type="button" id="pwToggle" aria-label="Show password" aria-pressed="false"><i data-i="eye"></i></button>
           </div>
-          <div class="field-error" id="pwErr" hidden><i data-i="alert"></i><span></span></div>
+          <div class="field-error" id="pwErr" hidden><i data-i="alert"></i><span class="msg"></span></div>
         </div>
         <label class="check"><input type="checkbox" id="remember" checked> Remember me on this device</label>
         <button class="btn btn-primary btn-block" type="submit" id="submitBtn">Sign in</button>
@@ -134,7 +134,7 @@
         <div class="field">
           <label for="fEmail">Email</label>
           <input class="input" id="fEmail" type="email" autocomplete="email" placeholder="you@company.com" aria-describedby="fEmailErr">
-          <div class="field-error" id="fEmailErr" hidden><i data-i="alert"></i><span></span></div>
+          <div class="field-error" id="fEmailErr" hidden><i data-i="alert"></i><span class="msg"></span></div>
         </div>
         <button class="btn btn-primary btn-block" type="submit" id="forgotBtn">Send reset link</button>
       </form>
@@ -169,7 +169,7 @@
   }
   function setErr(input, box, msg) {
     input.setAttribute('aria-invalid', msg ? 'true' : 'false');
-    box.hidden = !msg; box.querySelector('span').textContent = msg || '';
+    box.hidden = !msg; box.querySelector('.msg').textContent = msg || '';
   }
   function validateEmail(input, box) {
     const v = input.value.trim();

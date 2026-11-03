@@ -94,6 +94,27 @@
     </div>
   </section>
 
+  <section class="card box" id="backend">
+    <h2>后端依赖（只改 UI，后端保留 Krayin）</h2>
+    <p class="muted" style="margin-bottom:10px">按 2026-11-02 的指示：实现只覆盖 Krayin 的 Blade/Vue 视图，不加接口、不改数据库、不换框架。下面逐项对照 <code>2.2</code> 分支源码。标 <b>需定</b> 的项目要改后端才能按稿子实现，由 CRM PM 决定做不做，默认不改。</p>
+    <table>
+      <tr><th style="width:190px">稿子里的元素</th><th style="width:90px">结论</th><th>依据和建议</th></tr>
+      <tr><td>登录：校验错误、账号密码错误、忘记密码 → 已发送、记住我</td><td>不用改</td><td><code>SessionController</code> 已经接收 <code>remember</code>；找回密码和 60 分钟有效期是 Krayin 自带的。</td></tr>
+      <tr><td>顶栏：全局搜索、New 快速新建、通知铃铛</td><td>不用改</td><td>对应 <code>mega-search</code>、<code>quick-creation</code>、<code>notifications</code> 组件。通知要在设置里打开才显示。</td></tr>
+      <tr><td>New leads（含环比）、Won 金额（含环比）、按来源和类型的收入、热销产品、头部客户</td><td>不用改</td><td><code>Dashboard</code> 帮助类已有：<code>getTotalLeadsProgress</code>、<code>getTotalWonLeadValueProgress</code>、<code>getLeadsStatsBySources/Types</code>、<code>getTopSellingProducts</code>、<code>getTopPersons</code>。</td></tr>
+      <tr><td>管道选择、日期范围、导出 PDF</td><td>不用改</td><td>现有 dashboard 有 <code>pipeline_id</code> 和起止日期筛选。7 days / 30 days / Quarter 只是起止日期的快捷选项。</td></tr>
+      <tr><td>Win rate（本期数值）、“11 leads won”</td><td>前端可算</td><td>用现有 <code>won / lost over_time</code> 的数量相加即可。</td></tr>
+      <tr><td>Win rate 的环比 “4 pts”</td><td><b>需定</b></td><td>现有接口没有上一期的赢单数和丢单数。建议先去掉环比，只显示本期。</td></tr>
+      <tr><td>Open leads by stage 每阶段的金额、Open pipeline 总金额</td><td><b>需定</b></td><td><code>getOpenLeadsByStates</code> 只返回 <code>COUNT</code>，不返回金额。两种做法：(a) 只显示数量，不改后端；(b) 在这个查询里加 <code>SUM(lead_value)</code>，是一处很小的后端改动。建议先用 (a)。</td></tr>
+      <tr><td>New leads per week（按周的趋势）</td><td>前端可算</td><td>现有 <code>getTotalLeadsOverTime</code> 返回按时间分段的数量，前端可以按周汇总。只能落在 Krayin 已有的分段方式上。</td></tr>
+      <tr><td>Due today &amp; overdue 待办，以及勾选完成</td><td>前端可算</td><td>日历接口 <code>activities.get</code> 按起止日期返回 call / meeting / lunch，并带完成标记。“逾期”要把开始日期往前放宽，再在前端过滤未完成的，数据多了会慢。勾选完成用现有的活动更新接口。</td></tr>
+      <tr><td>Leads to follow up（“N 天没有活动”）</td><td><b>需定</b></td><td>Krayin 的“停滞线索”（rotten）按<b>创建时间</b>加上管道的 <code>rotten_days</code> 算，不看最后一次活动。线索列表已经支持 <code>rotten_lead</code> 筛选。两种做法：(a) 改用 Krayin 的定义，文案改成 “Past the pipeline's rotten days”，不改后端；(b) 按最后一次活动时间新写查询。建议先用 (a)。</td></tr>
+      <tr><td>侧栏 Leads 和 Mail 的数字</td><td>前端可算</td><td>需要在布局里多做两次计数查询（这是视图层的改动，不加接口）。也可以先不显示数字。</td></tr>
+      <tr><td>Landing 页（<code>/</code>）</td><td><b>需定</b></td><td>现在 <code>/</code> 直接跳到 <code>/admin/login</code>。做 landing 要加一条公开路由和一个视图，属于路由层的小改动。如果 CRM 只给内部用，可以不做 landing。</td></tr>
+      <tr><td>Continue with Google</td><td><b>需定</b></td><td>Krayin 没有 Google 登录，要做得新增 OAuth 登录。建议实现时先隐藏这个按钮，位置保留。</td></tr>
+    </table>
+  </section>
+
   <section class="card box">
     <h2>改前（现状）</h2>
     <p class="muted" style="margin-bottom:10px">没有截到实例截图：这次的运行环境没有 PHP、MySQL 和 Docker，跑不起 Krayin（这是票上的可选步骤，花费 $0，所以跳过了）。下面的现状是照 Blade 源码整理的。</p>
@@ -118,7 +139,7 @@
       <tr><td>重置链接 60 分钟内有效</td><td><code>config/auth.php</code> 里 <code>passwords.users.expire = 60</code></td></tr>
       <tr><td>Dashboard 导出 PDF、管道选择、日期范围</td><td>现有 dashboard 顶部就有这三个功能</td></tr>
     </table>
-    <p class="muted" style="margin-top:10px;font-size:13px">稿子里没有用户数、客户 logo 和用户评价。公司名和数字都是虚构的样例数据，邮箱都用 <code>.example</code> 域名。“Today / 该跟进”这两块要新写查询（按到期时间查活动、按最后一次活动时间查线索），需要的数据 Krayin 里都有。</p>
+    <p class="muted" style="margin-top:10px;font-size:13px">稿子里没有用户数、客户 logo 和用户评价。公司名和数字都是虚构的样例数据，邮箱都用 <code>.example</code> 域名。“Today / 该跟进”这两块用到哪些现有数据、哪里要改后端，见上面的<a href="#backend">后端依赖</a>。</p>
   </section>
 
   <section class="card box">
